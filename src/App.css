@@ -10,19 +10,46 @@ body {
 
 .lessonInfo {
     font-family: 'Russo One';
+    font-size: 24px;
+    color: white;
+}
+
+.otherInfo {
+    font-family: 'Russo One';
+    font-size: 16px;
     color: white;
 }
 
 .titleGen {
     font-family: 'Rubik Dirt';
     color: white;
-    font-size: 25px;
+    font-size: 35px;
 }
 
-.f-shrink {
-    flex-shrink: 1;
+.btn-lg {
+    width: 200px;
+    justify-content: center;
 }
 
-.resumeForm {
-    height: 1000 !important;
+.card {
+    margin-top: 40px;
+    margin-bottom: 20px;
+}
+
+@media (max-width: 767px) {
+    .btn-lg {
+        width: 100%;
+    }
+
+    .card {
+        margin-top: 0px;
+        margin-bottom: 20px;
+    }
+}
+
+
+@media (max-width: 767px) {
+    .btn-lg {
+        width: 100%;
+    }
 }
