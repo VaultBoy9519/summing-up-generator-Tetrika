@@ -22,3 +22,7 @@ body {
 .f-shrink {
     flex-shrink: 1;
 }
+
+.resumeForm {
+    height: 1000 !important;
+}
