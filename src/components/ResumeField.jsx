@@ -1,6 +1,6 @@
 import React from "react";
 
-const ResumeField = () => {
+const ResumeField = (props) => {
   return (
     <div>
       <div className="card">
@@ -17,7 +17,7 @@ const ResumeField = () => {
           </a>
         </div>
         <div className="card-body">
-          <p className="card-text" style={{ height: "150px", overflow: "auto" }}></p>
+          <p className="card-text" style={{ height: "150px", overflow: "auto" }}>{props.message}</p>
         </div>
       </div>
     </div>
