@@ -53,3 +53,8 @@ body {
         width: 100%;
     }
 }
+
+.pre {
+    max-width: 100%;
+    word-wrap: break-word;
+}

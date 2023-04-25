@@ -1,6 +1,8 @@
 import React from "react";
 
 const OptionalRecs = () => {
+
+
   return (
     <div>
       <ul>
@@ -36,8 +38,7 @@ const OptionalRecs = () => {
           <p>
             <div className="form-check d-flex justify-between">
               <input className="form-check-input" type="checkbox" id="checkOnpTutor" value="option1" />
-              <label className="form-check-label mr-25" enabled htmlFor="inlineCheckbox1">Передача П в ОНП на
-                ТО</label>
+              <label className="form-check-label mr-25" enabled htmlFor="inlineCheckbox1">Передача П в ОНП на ТО</label>
               <input className="form-check-input" type="checkbox" id="checkPupilDeactivate" disabled value="option1" />
             </div>
           </p>

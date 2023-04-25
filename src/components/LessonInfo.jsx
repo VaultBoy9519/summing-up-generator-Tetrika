@@ -16,10 +16,11 @@ const LessonInfo = (props) => {
     const name = target.name;
 
     setFormValues({ ...formValues, [name]: value });
-    props.onCreateLesson(formValues);
-    console.log(formValues.statusLessonToggle);
   };
 
+  React.useEffect(() => {
+    props.onCreateLesson(formValues);
+  }, [formValues]);
 
   return (
     <div>
@@ -44,7 +45,7 @@ const LessonInfo = (props) => {
         <p>
           <select className="form-select" name="statusLessonToggle" aria-label="statusLessonToggle"
                   onChange={handleInputChange}>
-
+            <option selected>Статус урока</option>
             <option value={1}>Неявка У (РУ)</option>
             <option value={2}>Неявка У (ВУ)</option>
             <option value={3}>Неявка П (РУ)</option>
