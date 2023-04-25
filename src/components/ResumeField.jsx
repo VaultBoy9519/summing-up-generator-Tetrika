@@ -24,7 +24,7 @@ const ResumeField = ({ userRole, message }) => {
         <div className="d-flex justify-between border">
           <h5 className="ml-5 mt-5">Резюмирование для {userRole}</h5>
           <a ref={copyButtonRef} className="btn btn-outline-secondary" data-clipboard-text={message}>
-            {isCopied ? <img width="16" height="16" src="/img/green-ok.svg" /> :
+            {isCopied ? <img width="16" height="16" src="img/green-ok.svg" /> :
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
                    className="bi bi-clipboard" viewBox="0 0 16 16">
                 <path
