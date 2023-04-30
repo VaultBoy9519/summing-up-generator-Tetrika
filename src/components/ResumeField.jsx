@@ -34,6 +34,7 @@ const ResumeField = ({ userRole, message }) => {
               </svg>}
           </a>
         </div>
+        
         <div className="card-body">
           <p className="card-text"
              style={{ height: "150px", overflow: "auto", whiteSpace: "pre-line", textAlign: "justify" }}>{message}</p>

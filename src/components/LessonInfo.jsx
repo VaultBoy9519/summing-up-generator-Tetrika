@@ -1,27 +1,30 @@
 import React from "react";
 
-const LessonInfo = (props) => {
+const LessonInfo = ({ onCreateLesson, onCreateColor, color }) => {
   const formState = {};
+  const formColor = {};
   const [formValues, setFormValues] = React.useState(formState);
+  const [colorForms] = React.useState(formColor);
+
 
   const handleInputChange = (event) => {
     const value = event.target.value;
     const name = event.target.name;
-
     setFormValues({ ...formValues, [name]: value });
-    console.log(formValues);
   };
 
   React.useEffect(() => {
     const elements = document.getElementsByClassName("form-control");
     for (let element of elements) {
+      formColor[element.name] = "white";
       formState[element.name] = "";
     }
   }, []);
 
   React.useEffect(() => {
-    props.onCreateLesson(formValues);
-  }, [formValues]);
+    onCreateLesson(formValues);
+    onCreateColor(colorForms);
+  }, [formValues, colorForms]);
 
   return (
     <div>
@@ -30,17 +33,29 @@ const LessonInfo = (props) => {
           Информация об уроке
         </p>
         <p>
-          <input className="form-control" name="dateLesson" placeholder="Дата и время урока (как в админке)"
+          <input className="form-control"
+                 style={{ backgroundColor: color.dateLesson }}
+                 name="dateLesson"
+                 placeholder={color.dateLesson === "white" ? "Дата и время урока (как в админке)" : "Введите значение"}
                  onChange={handleInputChange} />
         </p>
         <p>
-          <input className="form-control" name="nameTutor" placeholder="ФИО преподавателя (полностью)"
+          <input className="form-control"
+                 style={{ backgroundColor: color.nameTutor }}
+                 name="nameTutor"
+                 placeholder={color.nameTutor === "white" ? "ФИО преподавателя (полностью)" : "Введите значение"}
                  onChange={handleInputChange} />
         </p>
         <p className="d-flex">
-          <input className="form-control" name="namePupil" placeholder="Имя ученика"
+          <input className="form-control"
+                 style={{ backgroundColor: color.namePupil }}
+                 name="namePupil"
+                 placeholder={color.namePupil === "white" ? "Имя ученика" : "Введите значение"}
                  onChange={handleInputChange} />
-          <input className="form-control ml-15" name="idPupil" placeholder="ID ученика"
+          <input className="form-control ml-15"
+                 style={{ backgroundColor: color.idPupil }}
+                 name="idPupil"
+                 placeholder={color.idPupil === "white" ? "ID ученика" : "Введите значение"}
                  onChange={handleInputChange} />
         </p>
         <p>
@@ -54,6 +69,7 @@ const LessonInfo = (props) => {
             <option value={5}>Отмена (ВНН)</option>
             <option value={6}>Отмена (ТПсДС)</option>
             <option value={7}>Отмена + компенс</option>
+            <option value={8}>Завершено</option>
           </select>
         </p>
       </ul>

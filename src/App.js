@@ -41,17 +41,35 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
   let statusLessonMessage = ["", ""];
   const [optRecs, setOptRecs] = React.useState({});
   const [lesson, setLesson] = React.useState({});
+  const [color, setColor] = React.useState({});
 
   const handleCreateLesson = (formValues) => {
     setLesson(formValues);
+    console.log(lesson);
+  };
+
+  const handleCreateColor = (colorForms) => {
+    setColor(colorForms);
   };
 
   const handleOptionalRecs = (checkboxValues) => {
     setOptRecs(checkboxValues);
   };
 
-  let arrayFNF = [];
+  const highlightInput = () => {
+    console.log(arrNullValues);
+    for (let name of arrNullValues) {
+      setColor(prevState => ({ ...prevState, [name]: "yellow" }));
+      console.log(setColor);
+      setTimeout(
+        () => (setColor(prevState => ({ ...prevState, [name]: "white" }))),
+        800
+      );
+    }
+    console.log(lesson);
+  };
 
+  let arrayFNF = [];
 
   const setStatusLesson = () => {
     const arrayDayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"];
@@ -104,6 +122,10 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
         statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками со стороны платформы. Урок возвращен вам на баланс. В качестве извинения, я начислил вам бонусный урок.`,
           `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками со стороны платформы. За урок вам начислена компенсация.`];
         break;
+      case 8:
+        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), по правилам школы считается проведенным, поскольку проведено больше половины урока.`,
+          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, по правилам школы считается проведенным, поскольку проведено больше половины урока.`];
+        break;
     }
   };
 
@@ -119,19 +141,37 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
     return message;
   };
 
+  let arrNullValues = [];
+
   const generateSummary = () => {
 
-    setStatusLesson();
+    for (let name in lesson) {
+      if (lesson[name] === "") {
+        if (arrNullValues.includes(name)) {
+          continue;
+        } else {
+          arrNullValues.push(name);
+        }
+      }
+    }
 
-    setMessageToPupil(`Здравствуйте, ${lesson.namePupil}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookiePupil,
-      optRecs.checkLowSpeedPupil, optRecs.checkBrowserPupil, optRecs.checkHardwarePupil
-    )}${statusLessonMessage[0]}${optRecs.checkCompPupil === false ? "" : compensPupilMessage}\n\n${optRecs.checkTrueCallPupil === false ? summarizingMessage : noCallMessage}`);
-    setMessageToTutor(`Здравствуйте, ${arrayFNF[0]}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookieTutor,
-      optRecs.checkLowSpeedTutor, optRecs.checkBrowserTutor, optRecs.checkHardwareTutor, optRecs.checkOnpTutor
-    )}${statusLessonMessage[1]}\n\n${optRecs.checkTrueCallTutor === false ? summarizingMessage : noCallMessage}`);
+    if (arrNullValues.length > 0) {
+      highlightInput();
+      return;
+    } else {
+      setStatusLesson();
+
+      setMessageToPupil(`Здравствуйте, ${lesson.namePupil}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookiePupil,
+        optRecs.checkLowSpeedPupil, optRecs.checkBrowserPupil, optRecs.checkHardwarePupil
+      )}${statusLessonMessage[0]}${optRecs.checkCompPupil === false ? "" : compensPupilMessage}\n\n${optRecs.checkTrueCallPupil === false ? summarizingMessage : noCallMessage}`);
+      setMessageToTutor(`Здравствуйте, ${arrayFNF[0]}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookieTutor,
+        optRecs.checkLowSpeedTutor, optRecs.checkBrowserTutor, optRecs.checkHardwareTutor, optRecs.checkOnpTutor
+      )}${statusLessonMessage[1]}\n\n${optRecs.checkTrueCallTutor === false ? summarizingMessage : noCallMessage}`);
+    }
   };
 
-  const testFunction = () => {
+
+  const createNames = () => {
     lesson.dateLesson = `18:00 четверг, 31 февраля`;
     lesson.nameTutor = `Тест Тестович Тетрилин`;
     lesson.idPupil = `Ливерная Голубка 14`;
@@ -148,7 +188,11 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
             <div className="col-lg-4">
               <div className="row">
                 <div className="col-lg-12">
-                  <LessonInfo onCreateLesson={formValues => handleCreateLesson(formValues)} />
+                  <LessonInfo onCreateLesson={formValues => handleCreateLesson(formValues)}
+                              onCreateColor={colorForms => handleCreateColor(colorForms)}
+                              arrNullValues={arrNullValues}
+                              color={color}
+                  />
                 </div>
                 <div className="col-lg-12">
                   <OptionalRecs onCheckOptRecs={checkboxValues => handleOptionalRecs(checkboxValues)} />
@@ -178,13 +222,14 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
         <button type="button" className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10"
                 onClick={generateSummary}>Создать
         </button>
-        <button type="button" style={{ display: "none" }}
+
+        <button type="button"
                 className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
-                onClick={testFunction}>Заполнить
+                onClick={createNames}>Заполнить
         </button>
       </div>
       <div className="d-flex justify-end" style={{ color: "white", fontSize: "14px" }}>
-        Создал VaultBoy для ТП Тетрики, (v0.2, 29.04.2023).
+        Создал VaultBoy для ТП Тетрики, (v0.3, 30.04.2023).
       </div>
     </div>
   );

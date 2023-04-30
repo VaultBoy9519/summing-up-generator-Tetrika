@@ -20,6 +20,7 @@ const OptionalRecs = (props) => {
   const handleCheckboxChange = (event) => {
     const name = event.target.name;
     setCheckboxValues({ ...checkboxValues, [name]: !(checkboxValues[name]) });
+    console.log(event.target.name);
     console.log(checkboxValues);
   };
 
@@ -72,7 +73,7 @@ const OptionalRecs = (props) => {
           <div className="form-check d-flex justify-between mb-5">
             <input className="form-check-input" type="checkbox" name="checkTrueCallTutor" value="option1"
                    onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" enabled htmlFor="inlineCheckbox1">Удалось дозвониться?</label>
+            <label className="form-check-label mr-25" enabled htmlFor="inlineCheckbox1">Не удалось дозвониться</label>
             <input className="form-check-input" type="checkbox" name="checkTrueCallPupil" value="option1"
                    onChange={handleCheckboxChange} />
           </div>
