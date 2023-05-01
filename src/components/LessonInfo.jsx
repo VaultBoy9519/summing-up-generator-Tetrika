@@ -1,6 +1,6 @@
 import React from "react";
 
-const LessonInfo = ({ onCreateLesson, onCreateColor, color }) => {
+const LessonInfo = ({ onCreateLesson, color }) => {
   const formState = {};
   const formColor = {};
   const [formValues, setFormValues] = React.useState(formState);
@@ -22,8 +22,7 @@ const LessonInfo = ({ onCreateLesson, onCreateColor, color }) => {
   }, []);
 
   React.useEffect(() => {
-    onCreateLesson(formValues);
-    onCreateColor(colorForms);
+    onCreateLesson(formValues, colorForms);
   }, [formValues, colorForms]);
 
   return (

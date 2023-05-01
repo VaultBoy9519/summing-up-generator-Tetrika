@@ -4,8 +4,8 @@ import LessonInfo from "./components/LessonInfo";
 import OptionalRecs from "./components/OptionalRecs";
 import ResumeField from "./components/ResumeField";
 import React from "react";
-import { messages } from "./components/messages";
-import { statusInfo } from "./components/statusInfo";
+import { finishFragmentMessage, messages } from "./components/messages";
+import { statusInfoPupil, statusInfoTutor } from "./components/statusInfo";
 
 function App() {
 
@@ -15,19 +15,18 @@ function App() {
   const [lesson, setLesson] = React.useState({});
   const [color, setColor] = React.useState({});
 
-  const handleCreateLesson = (formValues) => {
+  //Колбэки для получения пропсов из LessonInfo
+  const onCreateLesson = (formValues, colorForms) => {
     setLesson(formValues);
-    console.log(lesson);
-  };
-
-  const handleCreateColor = (colorForms) => {
     setColor(colorForms);
   };
 
-  const handleOptionalRecs = (checkboxValues) => {
+  //Колбэк для получения пропса из OptionalRecs
+  const onCheckOptRecs = (checkboxValues) => {
     setOptRecs(checkboxValues);
   };
 
+  //отвечает за раскрашивание input-линий
   const highlightInput = () => {
     console.log(arrNullValues);
     for (let name of arrNullValues) {
@@ -41,78 +40,89 @@ function App() {
     console.log(lesson);
   };
 
-  let arrayFNF = [];
-  let statusLessonMessage = ["", ""];
+  let tutorFullName = [];
+  let statusFragment = ["", ""];
 
-  const setStatusLesson = () => {
-    const arrayDayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"];
-    const dateLessonArray = lesson.dateLesson.split(" ").filter((n) => {
-      return !arrayDayOfWeek.includes(n.replace(",", ""));
+  //функция отвечает только за создание фрагмента со статусом урока
+  const createStatusMessage = () => {
+
+    //Преобразование даты и времени в корректный формат
+    const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"];
+    const adminkaDateLesson = lesson.dateLesson.split(" ").filter((n) => {
+      return !dayOfWeek.includes(n.replace(",", ""));
     });
-    const dateAndTime = `${dateLessonArray[1]} ${dateLessonArray[2]} в ${dateLessonArray[0]}`;
+    const dateAndTime = `${parseInt(adminkaDateLesson[1], 10)} ${adminkaDateLesson[2]} в ${adminkaDateLesson[0]}`;
     if (lesson.nameTutor !== undefined) {
-      arrayFNF = lesson.nameTutor.split(" ");
+      tutorFullName = lesson.nameTutor.split(" ");
     }
 
+    //Функция выполняется в следующей, безымянной. Нужна для формирования полного фрагмента после установки статуса
     const setStatusLessonMessage = (pupilMessage, tutorMessage) => {
-      const startInfoPupil = `\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), `;
-      const startInfoTutor = `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, `;
-      return statusLessonMessage = [`${startInfoPupil}${pupilMessage}`,
+      const startInfoPupil = `\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${tutorFullName[0]} ${tutorFullName[1]}), `;
+      const startInfoTutor = `\n\nУрок, назначенный на ${dateAndTime} по Мск (ученик ${lesson.namePupil} ${lesson.idPupil}), `;
+      return statusFragment = [`${startInfoPupil}${pupilMessage}`,
         `${startInfoTutor}${tutorMessage}`];
     };
 
-    switch (Number(lesson.statusLesson)) {
-      //Неявка У - РУ
-      case 1:
-        setStatusLessonMessage(statusInfo.nonPupilRegP, statusInfo.nonPupilT);
-        break;
-      // Неявка У - ВУ
-      case 2:
-        setStatusLessonMessage(statusInfo.nonPupilIntroP, statusInfo.nonPupilT);
-        break;
-      //Неявка П - РУ
-      case 3:
-        setStatusLessonMessage(statusInfo.nonTutorRegP, statusInfo.nonTutorRegT);
-        break;
-      //Неявка П - ВУ
-      case 4:
-        setStatusLessonMessage(statusInfo.nonTutorIntroP, statusInfo.nonTutorIntroT);
-        break;
-      //Отмена РУ - ВНН
-      case 5:
-        setStatusLessonMessage(statusInfo.cancelNotCauseP, statusInfo.cancelNotCauseT);
-        break;
-      //Отмена РУ - ТПсДС
-      case 6:
-        setStatusLessonMessage(statusInfo.cancelBothP, statusInfo.cancelBothT);
-        break;
-      //Отмена РУ + компенс
-      case 7:
-        setStatusLessonMessage(statusInfo.cancelBugP, statusInfo.cancelBugT);
-        break;
-      // Завершено
-      case 8:
-        setStatusLessonMessage(statusInfo.finish, statusInfo.finish);
-        break;
-    }
+    //Функция в зависимости от цифры-значения в статусе урока создает сообщение по статусу
+    (() => {
+      const keysPupil = Object.keys(statusInfoPupil);
+      const keysTutor = Object.keys(statusInfoTutor);
+      for (let numberStatus = 0; numberStatus <= keysPupil.length; numberStatus++) {
+        if (numberStatus === (Number(lesson.statusLesson) - 1)) {
+          const statusPupilValue = statusInfoPupil[keysPupil[numberStatus]];
+          const statusTutorValue = statusInfoTutor[keysTutor[numberStatus]];
+          return setStatusLessonMessage(statusPupilValue, statusTutorValue);
+        }
+      }
+    })();
   };
 
-  const optRecsChecker = (checkCookie, checkInt, checkBrowser, checkHardware, checkOnpComp) => {
-    const checker = (checkName, rec) => {
-      return checkName === true ? rec : "";
-    };
-    const message = `${checker(checkCookie, messages.cookieRec)}${
-      checker(checkInt, messages.internetRec)}${checker(checkBrowser, messages.browserRec)}${
-      checker(checkHardware, messages.hardwareRec)}${
-      checker(checkOnpComp, messages.onpTutorMessage)
-    }`;
-    return message;
+  //функция формирует полное сообщение со статусом урока и всеми рекомендациями
+  //в зависимости от роли получателя (Tutor/Pupil)
+  const createFullMessage = (roleUser) => {
+    const optRecsKeys = Object.keys(optRecs).filter(key => key.includes(roleUser));
+    const messagesKeys = Object.keys(messages);
+    const arrMessage = [];
+    for (let i = 0; i < optRecsKeys.length - 1; i++) {
+      const messageRecs = messages[messagesKeys[i]];
+      if (optRecs[optRecsKeys[i]] === true) {
+        if (Array.isArray(messageRecs)) {
+          if (roleUser === "Pupil") {
+            arrMessage.push(statusFragment[0]);
+            arrMessage.push(messageRecs[1]);
+          } else {
+            arrMessage.push(messageRecs[0]);
+            arrMessage.push(statusFragment[1]);
+          }
+        } else {
+          arrMessage.push(messageRecs);
+        }
+      }
+    }
+    //Добавление фрагмента статуса урока, если он не был добавлен вместе с компенсом/ОНП
+    if (!arrMessage.includes(statusFragment[0]) && !arrMessage.includes(statusFragment[1])) {
+      roleUser === "Pupil" ?
+        arrMessage.push(statusFragment[0]) :
+        arrMessage.push(statusFragment[1]);
+    }
+    return (`Здравствуйте, ${
+      roleUser === "Pupil" ?
+        lesson.namePupil :
+        tutorFullName[0]
+    }. Техподдержка Тетрики снова на связи!${arrMessage.join("")}\n\n${
+      optRecs[optRecsKeys[optRecsKeys.length - 1]] === false ?
+        finishFragmentMessage.summarizingMessage :
+        finishFragmentMessage.noCallMessage
+    }`);
   };
 
   let arrNullValues = [];
 
+  //функция вызывается при нажатии кнопки "Создать"
   const generateSummary = () => {
 
+    //Если есть незаполненные input, названия добавляются в массив
     for (let name in lesson) {
       if (lesson[name] === "") {
         if (arrNullValues.includes(name)) {
@@ -123,28 +133,36 @@ function App() {
       }
     }
 
+    //в случае, если массив не пустой, input с соответствующим
+    //названием подсвечивается желтым и функция завершается, иначе формируется сообщение
+    //со статусом урока
     if (arrNullValues.length > 0) {
       highlightInput();
       return;
     } else {
-      setStatusLesson();
+      createStatusMessage();
 
-      setMessageToPupil(`Здравствуйте, ${lesson.namePupil}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookiePupil,
-        optRecs.checkLowSpeedPupil, optRecs.checkBrowserPupil, optRecs.checkHardwarePupil
-      )}${statusLessonMessage[0]}${optRecs.checkCompPupil === false ? "" : messages.compPupilMessage}\n\n${optRecs.checkTrueCallPupil === false ? messages.summarizingMessage : messages.noCallMessage}`);
-      setMessageToTutor(`Здравствуйте, ${arrayFNF[0]}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookieTutor,
-        optRecs.checkLowSpeedTutor, optRecs.checkBrowserTutor, optRecs.checkHardwareTutor, optRecs.checkOnpTutor
-      )}${statusLessonMessage[1]}\n\n${optRecs.checkTrueCallTutor === false ? messages.summarizingMessage : messages.noCallMessage}`);
+      setMessageToPupil(createFullMessage("Pupil"));
+      setMessageToTutor(createFullMessage("Tutor"));
+
     }
   };
 
+  const clear = () => {
+    const obj = {};
+    for (let key in optRecs) {
+      obj[key] = false;
+    }
+    setOptRecs(obj);
+    console.log(optRecs);
+  };
 
+//автозаполнение объекта с инфой об уроке
   const createNames = () => {
     lesson.dateLesson = `18:00 четверг, 31 февраля`;
     lesson.nameTutor = `Тест Тестович Тетрилин`;
     lesson.idPupil = `Ливерная Голубка 14`;
     lesson.namePupil = `Тест Ева`;
-    console.log(lesson);
   };
 
   return (
@@ -156,14 +174,14 @@ function App() {
             <div className="col-lg-4">
               <div className="row">
                 <div className="col-lg-12">
-                  <LessonInfo onCreateLesson={formValues => handleCreateLesson(formValues)}
-                              onCreateColor={colorForms => handleCreateColor(colorForms)}
+                  <LessonInfo onCreateLesson={(formValues, colorForms) => onCreateLesson(formValues, colorForms)}
                               arrNullValues={arrNullValues}
                               color={color}
                   />
                 </div>
                 <div className="col-lg-12">
-                  <OptionalRecs onCheckOptRecs={checkboxValues => handleOptionalRecs(checkboxValues)} />
+                  <OptionalRecs onCheckOptRecs={checkboxValues => onCheckOptRecs(checkboxValues)}
+                                optRecs={optRecs} />
                 </div>
               </div>
             </div>
@@ -192,12 +210,13 @@ function App() {
         </button>
 
         <button type="button"
+                style={{ display: "none" }}
                 className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
-                onClick={createNames}>Заполнить
+                onClick={clear}>Заполнить
         </button>
       </div>
       <div className="d-flex justify-end" style={{ color: "white", fontSize: "14px" }}>
-        Создал VaultBoy для ТП Тетрики, (v0.3, 30.04.2023).
+        Создал VaultBoy для ТП Тетрики, (v0.4, 01.05.2023).
       </div>
     </div>
   );

@@ -1,6 +1,6 @@
 import React from "react";
 
-const OptionalRecs = (props) => {
+const Index = (props) => {
   const checkboxState = {};
   const [checkboxValues, setCheckboxValues] = React.useState(checkboxState);
 
@@ -11,6 +11,11 @@ const OptionalRecs = (props) => {
       checkboxState[element.name] = false;
     }
   }, []);
+
+  const test = () => {
+    setCheckboxValues(props.optRecs);
+    console.log(`Получилось`);
+  };
 
   React.useEffect(() => {
     props.onCheckOptRecs(checkboxValues);
@@ -36,31 +41,31 @@ const OptionalRecs = (props) => {
         </div>
         <div className="otherInfo">
           <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkLowSpeedTutor" value="option1"
+            <input className="form-check-input" type="checkbox" name="checkCookieTutor" value="option1"
+                   onChange={handleCheckboxChange} />
+            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Чистка cookie/кеш-файлов</label>
+            <input className="form-check-input" type="checkbox" name="checkCookiePupil" value="option1"
+                   onChange={handleCheckboxChange} />
+          </div>
+          <div className="form-check d-flex justify-between mb-5">
+            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkLowSpeedTutor" value="option1"
                    onChange={handleCheckboxChange} />
             <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Низкая скорость интернета</label>
             <input className="form-check-input" type="checkbox" name="checkLowSpeedPupil" value="option1"
                    onChange={handleCheckboxChange} />
           </div>
           <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkBrowserTutor" value="option1"
+            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkBrowserTutor" value="option1"
                    onChange={handleCheckboxChange} />
             <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Нерекомендуемый браузер</label>
             <input className="form-check-input" type="checkbox" name="checkBrowserPupil" value="option1"
                    onChange={handleCheckboxChange} />
           </div>
           <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkHardwareTutor" value="option1"
+            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkHardwareTutor" value="option1"
                    onChange={handleCheckboxChange} />
             <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Несоответствие мин.треб.</label>
             <input className="form-check-input" type="checkbox" name="checkHardwarePupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkCookieTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Чистка cookie/кеш-файлов</label>
-            <input className="form-check-input" type="checkbox" name="checkCookiePupil" value="option1"
                    onChange={handleCheckboxChange} />
           </div>
           <div className="form-check d-flex justify-between mb-5">
@@ -84,4 +89,4 @@ const OptionalRecs = (props) => {
   );
 };
 
-export default OptionalRecs;
+export default Index;
