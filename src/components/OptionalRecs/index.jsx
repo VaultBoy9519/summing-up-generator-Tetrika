@@ -1,6 +1,6 @@
 import React from "react";
 
-const Index = (props) => {
+const OptionalRecs = (props) => {
   const checkboxState = {};
   const [checkboxValues, setCheckboxValues] = React.useState(checkboxState);
 
@@ -89,4 +89,4 @@ const Index = (props) => {
   );
 };
 
-export default Index;
+export default OptionalRecs;
