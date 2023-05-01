@@ -6,10 +6,9 @@ import ResumeField from "./components/ResumeField";
 import React from "react";
 
 function App() {
-
   const internetRec = `\n\nУ вас зафиксирована низкая скорость интернет-соединения. Рекомендую во время урока находиться ближе к роутеру или, при возможности, использовать проводное подключение. Также, перед следующим занятием, перезагрузите, пожалуйста, роутер. Если неполадка все равно повторится и рекомендации выше не помогут, обратитесь, пожалуйста, к вашему интернет-провайдеру.
 
-Скорость интернет-соединения вы можете проверить на сайте www.speedtest.net. Подробная инструкция по измерению скорости доступна по ссылке: 
+Скорость интернет-соединения вы можете проверить на сайте www.speedtest.net. Подробная инструкция по измерению скорости доступна по ссылке:
 https://tetrikasupp.notion.site/9ca6313f16384947ad499d64bf064580`;
   const browserRec = `\n\nИспользуемый вами браузер не подходит для занятий. Пользуйтесь, пожалуйста, Google Chrome или Mozilla Firefox. Скачать их вы можете по этим ссылкам:
 
@@ -177,6 +176,7 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
     lesson.idPupil = `Ливерная Голубка 14`;
     lesson.namePupil = `Тест Ева`;
     console.log(lesson);
+    console.log(internetRec);
   };
 
   return (
@@ -223,7 +223,7 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
                 onClick={generateSummary}>Создать
         </button>
 
-        <button type="button"
+        <button type="button" style={{ display: "none" }}
                 className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
                 onClick={createNames}>Заполнить
         </button>
