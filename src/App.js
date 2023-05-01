@@ -4,40 +4,13 @@ import LessonInfo from "./components/LessonInfo";
 import OptionalRecs from "./components/OptionalRecs";
 import ResumeField from "./components/ResumeField";
 import React from "react";
+import { messages } from "./components/messages";
+import { statusInfo } from "./components/statusInfo";
 
 function App() {
-  const internetRec = `\n\nУ вас зафиксирована низкая скорость интернет-соединения. Рекомендую во время урока находиться ближе к роутеру или, при возможности, использовать проводное подключение. Также, перед следующим занятием, перезагрузите, пожалуйста, роутер. Если неполадка все равно повторится и рекомендации выше не помогут, обратитесь, пожалуйста, к вашему интернет-провайдеру.
-
-Скорость интернет-соединения вы можете проверить на сайте www.speedtest.net. Подробная инструкция по измерению скорости доступна по ссылке:
-https://tetrikasupp.notion.site/9ca6313f16384947ad499d64bf064580`;
-  const browserRec = `\n\nИспользуемый вами браузер не подходит для занятий. Пользуйтесь, пожалуйста, Google Chrome или Mozilla Firefox. Скачать их вы можете по этим ссылкам:
-
-Google Chrome: https://www.google.com/intl/ru/chrome/
-Mozilla Firefox: https://www.mozilla.org/ru/firefox/new/
-
-Для устройств от компании Apple вы можете использовать стандартный браузер Safari.
-
-Более подробно с установкой браузера вы можете ознакомиться в этих статьях:
-https://tetrikasupp.notion.site/Windows-bcc2b1b95f4849d59bf8a9024e011f37
-https://tetrikasupp.notion.site/Mac-ff3f6f8346e541669122d88def2042b4`;
-  const hardwareRec = `\n\nУстройство, которое вы используете, не подходит для занятий по системным требованиям, указанным в договоре-оферте. Для комфортных уроков рекомендую сменить его на более современное.
-
-Для выбора устройства ознакомьтесь, пожалуйста, с системными требованиями по ссылке ниже:
-https://tetrikasupp.notion.site/54f51d9eb9b64a8f93856f635bcc30b3.`;
-  const cookieRec = `\n\nДля решения возникшей неполадки рекомендую провести очистку временных файлов браузера. Заранее сообщаю, что после этих действий вы выйдете из всех аккаунтов на сайтах, где авторизовались ранее, и вам нужно будет сделать это повторно. Чтобы провести очистку, воспользуйтесь инструкцией для своего браузера:
-
-Google Chrome: https://support.google.com/accounts/answer/32050?hl=ru&co=GENIE.Platform%3DDesktop
-Mozilla Firefox: https://support.mozilla.org/ru/kb/udalenie-kuki-i-dannyh-sajtov-v-firefox?redirectslug=udalenie-kukov-dlya-udaleniya-informacii-kotoruyu-&redirectlocale=ru
-Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
-  const onpTutorMessage = `\n\nЧерез две недели с вами свяжется мой коллега, чтобы узнать, удалось ли исправить неполадки, а также записать на повторную проверку.`;
-  const compensPupilMessage = `\n\nПо вашей просьбе, передал запрос на компенсацию урока. В течение трех дней ваш запрос будет рассмотрен. Если запрос будет согласован, вам будет начислен компенсационный урок, и ответ об этом поступит в чат вашего личного кабинета.`;
-  const summarizingMessage = `Если у вас остались вопросы, напишите, пожалуйста, в чат поддержки личного кабинета. Также, вы можете нажать на кнопку в уроке "Сообщить о тех. проблеме", я или мой коллега оперативно придем к вам на помощь. Кнопка расположена в разделе "Чат с поддержкой", рядом с кнопкой "Чат с репетитором".`;
-  const noCallMessage = `Мы закрываем это обращение, так как не получилось связаться с вами.
-Если вы ждете нашей помощи, пожалуйста, напишите удобный способ и время для связи.`;
 
   const [messageToPupil, setMessageToPupil] = React.useState("");
   const [messageToTutor, setMessageToTutor] = React.useState("");
-  let statusLessonMessage = ["", ""];
   const [optRecs, setOptRecs] = React.useState({});
   const [lesson, setLesson] = React.useState({});
   const [color, setColor] = React.useState({});
@@ -69,6 +42,7 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
   };
 
   let arrayFNF = [];
+  let statusLessonMessage = ["", ""];
 
   const setStatusLesson = () => {
     const arrayDayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"];
@@ -80,50 +54,45 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
       arrayFNF = lesson.nameTutor.split(" ");
     }
 
+    const setStatusLessonMessage = (pupilMessage, tutorMessage) => {
+      const startInfoPupil = `\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), `;
+      const startInfoTutor = `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, `;
+      return statusLessonMessage = [`${startInfoPupil}${pupilMessage}`,
+        `${startInfoTutor}${tutorMessage}`];
+    };
+
     switch (Number(lesson.statusLesson)) {
       //Неявка У - РУ
       case 1:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками с вашей стороны. По правилам школы, он будет списан у вас с баланса.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками со стороны ученика. За урок вам начислена компенсация.
-Ученику предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`];
+        setStatusLessonMessage(statusInfo.nonPupilRegP, statusInfo.nonPupilT);
         break;
       // Неявка У - ВУ
       case 2:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками с вашей стороны. Урок возвращен вам на баланс. С вами свяжется мой коллега по поводу его переназначения.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками со стороны ученика. За урок вам начислена компенсация.
-Ученику предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`];
+        setStatusLessonMessage(statusInfo.nonPupilIntroP, statusInfo.nonPupilT);
         break;
       //Неявка П - РУ
       case 3:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками со стороны преподавателя. Урок возвращен вам на баланс. В качестве извинения, я начислил вам бонусный урок.
-Преподавателю предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками с вашей стороны. По правилам школы, за урок полагается штраф в размере ставки урока.`];
+        setStatusLessonMessage(statusInfo.nonTutorRegP, statusInfo.nonTutorRegT);
         break;
       //Неявка П - ВУ
       case 4:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками со стороны преподавателя. Урок возвращен вам на баланс. С вами свяжется мой коллега по поводу его переназначения.
-Преподавателю предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками с вашей стороны. Штраф за данный урок не полагается.`];
+        setStatusLessonMessage(statusInfo.nonTutorIntroP, statusInfo.nonTutorIntroT);
         break;
       //Отмена РУ - ВНН
       case 5:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен, поскольку не удалось установить причину неполадки. По правилам школы, урок возвращен вам на баланс.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен, поскольку не удалось установить причину неполадки. По правилам школы, оплата за урок не полагается.`];
+        setStatusLessonMessage(statusInfo.cancelNotCauseP, statusInfo.cancelNotCauseT);
         break;
       //Отмена РУ - ТПсДС
       case 6:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками как с вашей стороны, так и со стороны преподавателя. По правилам школы, урок вернется вам на баланс.
-Преподавателю предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками как с вашей стороны, так и со стороны ученика. По правилам школы, оплата за урок не полагается.
-Ученику предоставлены все необходимые рекомендации, чтобы избежать неполадок с его стороны на будущих уроках.`];
+        setStatusLessonMessage(statusInfo.cancelBothP, statusInfo.cancelBothT);
         break;
+      //Отмена РУ + компенс
       case 7:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), отменен в связи с техническими неполадками со стороны платформы. Урок возвращен вам на баланс. В качестве извинения, я начислил вам бонусный урок.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, отменен в связи с техническими неполадками со стороны платформы. За урок вам начислена компенсация.`];
+        setStatusLessonMessage(statusInfo.cancelBugP, statusInfo.cancelBugT);
         break;
+      // Завершено
       case 8:
-        statusLessonMessage = [`\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${arrayFNF[0]} ${arrayFNF[1]}), по правилам школы считается проведенным, поскольку проведено больше половины урока.`,
-          `\n\nУрок, назначенный на ${dateAndTime} по Мск с учеником ${lesson.namePupil} ${lesson.idPupil}, по правилам школы считается проведенным, поскольку проведено больше половины урока.`];
+        setStatusLessonMessage(statusInfo.finish, statusInfo.finish);
         break;
     }
   };
@@ -132,10 +101,10 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
     const checker = (checkName, rec) => {
       return checkName === true ? rec : "";
     };
-    const message = `${checker(checkCookie, cookieRec)}${
-      checker(checkInt, internetRec)}${checker(checkBrowser, browserRec)}${
-      checker(checkHardware, hardwareRec)}${
-      checker(checkOnpComp, onpTutorMessage)
+    const message = `${checker(checkCookie, messages.cookieRec)}${
+      checker(checkInt, messages.internetRec)}${checker(checkBrowser, messages.browserRec)}${
+      checker(checkHardware, messages.hardwareRec)}${
+      checker(checkOnpComp, messages.onpTutorMessage)
     }`;
     return message;
   };
@@ -162,10 +131,10 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
 
       setMessageToPupil(`Здравствуйте, ${lesson.namePupil}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookiePupil,
         optRecs.checkLowSpeedPupil, optRecs.checkBrowserPupil, optRecs.checkHardwarePupil
-      )}${statusLessonMessage[0]}${optRecs.checkCompPupil === false ? "" : compensPupilMessage}\n\n${optRecs.checkTrueCallPupil === false ? summarizingMessage : noCallMessage}`);
+      )}${statusLessonMessage[0]}${optRecs.checkCompPupil === false ? "" : messages.compPupilMessage}\n\n${optRecs.checkTrueCallPupil === false ? messages.summarizingMessage : messages.noCallMessage}`);
       setMessageToTutor(`Здравствуйте, ${arrayFNF[0]}. Техподдержка Тетрики снова на связи!${optRecsChecker(optRecs.checkCookieTutor,
         optRecs.checkLowSpeedTutor, optRecs.checkBrowserTutor, optRecs.checkHardwareTutor, optRecs.checkOnpTutor
-      )}${statusLessonMessage[1]}\n\n${optRecs.checkTrueCallTutor === false ? summarizingMessage : noCallMessage}`);
+      )}${statusLessonMessage[1]}\n\n${optRecs.checkTrueCallTutor === false ? messages.summarizingMessage : messages.noCallMessage}`);
     }
   };
 
@@ -176,7 +145,6 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
     lesson.idPupil = `Ливерная Голубка 14`;
     lesson.namePupil = `Тест Ева`;
     console.log(lesson);
-    console.log(internetRec);
   };
 
   return (
@@ -223,7 +191,7 @@ Safari: https://support.apple.com/ru-ru/guide/safari/sfri11471/mac`;
                 onClick={generateSummary}>Создать
         </button>
 
-        <button type="button" style={{ display: "none" }}
+        <button type="button"
                 className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
                 onClick={createNames}>Заполнить
         </button>
