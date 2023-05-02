@@ -12,12 +12,14 @@ body {
     font-family: 'Russo One';
     font-size: 24px;
     color: white;
+    margin-bottom: 10px;
 }
 
 .otherInfo {
     font-family: 'Russo One';
     font-size: 16px;
     color: white;
+
 }
 
 .titleGen {
@@ -33,28 +35,82 @@ body {
 
 .card {
     margin-top: 40px;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
 }
 
-@media (max-width: 767px) {
-    .btn-lg {
-        width: 100%;
-    }
-
-    .card {
-        margin-top: 0px;
-        margin-bottom: 20px;
-    }
-}
-
-
-@media (max-width: 767px) {
-    .btn-lg {
-        width: 100%;
-    }
+.versionText {
+    position: fixed;
+    right: 5px;
+    bottom: 5px;
+    color: white;
+    font-size: 14px;
 }
 
 .pre {
     max-width: 100%;
     word-wrap: break-word;
+}
+
+.form-control {
+    margin-bottom: 15px;
+}
+
+.margin > div:first-child {
+    margin-right: 15px;
+}
+
+.elementMargin {
+    margin-top: 8px;
+    margin-bottom: 26px;
+}
+
+@media (max-width: 500px) {
+    .btn-lg {
+        width: 95%
+    }
+}
+
+@media (max-width: 572px) {
+    .titleGen {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 900px) {
+
+    .card {
+        margin-top: 10px;
+        margin-bottom: 0px;
+    }
+
+    .versionText {
+        display: flex;
+        justify-content: end;
+        position: relative;
+        right: auto;
+        bottom: auto;
+    }
+}
+
+@media (max-width: 528px) {
+    h5 {
+        font-size: 18px;
+    }
+
+    .titleGen {
+        font-size: 22px;
+        margin-bottom: 0px;
+    }
+
+    .lessonInfo {
+        font-size: 18px;
+    }
+
+    .elementMargin {
+        margin: 0px;
+    }
+
+    .versionText {
+        justify-content: center;
+    }
 }

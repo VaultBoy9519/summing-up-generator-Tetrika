@@ -1,6 +1,9 @@
 import React from "react";
+import AppContext from "../AppContext";
 
-const Checkbox = ({ handleCheckboxChange, text, nameTutor, namePupil }) => {
+const Checkbox = ({ text, nameTutor, namePupil }) => {
+  const { handleCheckboxChange } = React.useContext(AppContext);
+
   return (
     <div className="form-check d-flex justify-between mb-5">
       <input className="form-check-input" type="checkbox" name={nameTutor} value="option1"

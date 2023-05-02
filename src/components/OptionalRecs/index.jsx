@@ -1,6 +1,9 @@
 import React from "react";
+import Checkbox from "./Checkbox";
+import { checkboxProps } from "./checkboxProps";
+import AppContext from "../AppContext";
 
-const OptionalRecs = (props) => {
+const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
   const checkboxState = {};
   const [checkboxValues, setCheckboxValues] = React.useState(checkboxState);
 
@@ -12,13 +15,8 @@ const OptionalRecs = (props) => {
     }
   }, []);
 
-  const test = () => {
-    setCheckboxValues(props.optRecs);
-    console.log(`Получилось`);
-  };
-
   React.useEffect(() => {
-    props.onCheckOptRecs(checkboxValues);
+    onCheckOptRecs(checkboxValues);
   }, [checkboxValues]);
 
   //при выборе чекбокса, его значение будет менять состояние checkboxValue на противоположное
@@ -29,10 +27,28 @@ const OptionalRecs = (props) => {
     console.log(checkboxValues);
   };
 
+  function PropsCreator(nameTutor, namePupil, text) {
+    this.nameTutor = nameTutor;
+    this.namePupil = namePupil;
+    this.text = text;
+  };
+
+
+  const checkboxPropsFull = checkboxProps.map(props => new PropsCreator(props.nameTutor, props.namePupil, props.text));
+  const checkboxesList = checkboxPropsFull.map((checkbox, index) => {
+    return <Checkbox key={index}
+                     nameTutor={checkbox.nameTutor}
+                     namePupil={checkbox.namePupil}
+                     text={checkbox.text}
+    />;
+  });
+
+  const { testFunction } = React.useContext(AppContext);
+
   return (
-    <div>
-      <ul>
-        <p className="lessonInfo mt-10">
+    <AppContext.Provider value={{ handleCheckboxChange }}>
+      <div>
+        <p className="lessonInfo mt-10 mb-0">
           Доп. рекомендации
         </p>
         <div className="otherInfo d-flex justify-between p-1">
@@ -40,52 +56,15 @@ const OptionalRecs = (props) => {
           <div>У</div>
         </div>
         <div className="otherInfo">
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkCookieTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Чистка cookie/кеш-файлов</label>
-            <input className="form-check-input" type="checkbox" name="checkCookiePupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkLowSpeedTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Низкая скорость интернета</label>
-            <input className="form-check-input" type="checkbox" name="checkLowSpeedPupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkBrowserTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Нерекомендуемый браузер</label>
-            <input className="form-check-input" type="checkbox" name="checkBrowserPupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input tutorCheckbox" type="checkbox" name="checkHardwareTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Несоответствие мин.треб.</label>
-            <input className="form-check-input" type="checkbox" name="checkHardwarePupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkOnpTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" htmlFor="inlineCheckbox1">Передача П в ОНП / У на компенс</label>
-            <input className="form-check-input" type="checkbox" name="checkCompPupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
-          <div className="form-check d-flex justify-between mb-5">
-            <input className="form-check-input" type="checkbox" name="checkTrueCallTutor" value="option1"
-                   onChange={handleCheckboxChange} />
-            <label className="form-check-label mr-25" enabled htmlFor="inlineCheckbox1">Не удалось дозвониться</label>
-            <input className="form-check-input" type="checkbox" name="checkTrueCallPupil" value="option1"
-                   onChange={handleCheckboxChange} />
-          </div>
+          {checkboxesList}
         </div>
-
-      </ul>
-    </div>
+        <button type="button"
+                style={{ display: "none" }}
+                className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
+                onClick={testFunction}>Заполнить
+        </button>
+      </div>
+    </AppContext.Provider>
   );
 };
 

@@ -1,11 +1,12 @@
 import "./App.css";
 import Header from "./components/Header";
-import LessonInfo from "./components/LessonInfo";
 import OptionalRecs from "./components/OptionalRecs";
 import ResumeField from "./components/ResumeField";
 import React from "react";
-import { finishFragmentMessage, messages } from "./components/messages";
-import { statusInfoPupil, statusInfoTutor } from "./components/statusInfo";
+import { finishFragmentMessage, messages } from "./objects/messages";
+import { statusInfoPupil, statusInfoTutor } from "./objects/statusInfo";
+import LessonInfo from "./components/LessonInfo";
+import AppContext from "./components/AppContext";
 
 function App() {
 
@@ -15,7 +16,7 @@ function App() {
   const [lesson, setLesson] = React.useState({});
   const [color, setColor] = React.useState({});
 
-  //Колбэки для получения пропсов из LessonInfo
+  //Колбэки для получения пропсов из Index
   const onCreateLesson = (formValues, colorForms) => {
     setLesson(formValues);
     setColor(colorForms);
@@ -157,6 +158,8 @@ function App() {
     console.log(optRecs);
   };
 
+  const { testFunction } = React.useContext(AppContext);
+
 //автозаполнение объекта с инфой об уроке
   const createNames = () => {
     lesson.dateLesson = `18:00 четверг, 31 февраля`;
@@ -165,60 +168,62 @@ function App() {
     lesson.namePupil = `Тест Ева`;
   };
 
+
   return (
-    <div className="App">
-      <Header />
-      <div>
-        <div className="container">
-          <div className="row">
-            <div className="col-lg-4">
-              <div className="row">
-                <div className="col-lg-12">
-                  <LessonInfo onCreateLesson={(formValues, colorForms) => onCreateLesson(formValues, colorForms)}
-                              arrNullValues={arrNullValues}
-                              color={color}
-                  />
-                </div>
-                <div className="col-lg-12">
-                  <OptionalRecs onCheckOptRecs={checkboxValues => onCheckOptRecs(checkboxValues)}
-                                optRecs={optRecs} />
+    <AppContext.Provider value={{ color }}>
+      <div className="App">
+        <Header />
+        <div>
+          <div className="container">
+            <div className="row">
+              <div className="col-lg-4">
+                <div className="row">
+                  <div className="col-lg-12 elementMargin">
+                    <LessonInfo onCreateLesson={(formValues, colorForms) => onCreateLesson(formValues, colorForms)}
+                                arrNullValues={arrNullValues}
+                    />
+                  </div>
+                  <div className="col-lg-12">
+                    <OptionalRecs onCheckOptRecs={checkboxValues => onCheckOptRecs(checkboxValues)}
+                                  optRecs={optRecs} />
+                  </div>
                 </div>
               </div>
-            </div>
-            <div className="col-lg-8">
-              <div className="row">
-                <div className="col-lg-12">
-                  <ResumeField
-                    userRole={"ученика"}
-                    message={messageToPupil}
-                  />
-                </div>
-                <div className="col-lg-12">
-                  <ResumeField
-                    userRole={"преподавателя"}
-                    message={messageToTutor}
-                  />
+              <div className="col-lg-8">
+                <div className="row">
+                  <div className="col-lg-12">
+                    <ResumeField
+                      userRole={"ученика"}
+                      message={messageToPupil}
+                    />
+                  </div>
+                  <div className="col-lg-12">
+                    <ResumeField
+                      userRole={"преподавателя"}
+                      message={messageToTutor}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div>
-        <button type="button" className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10"
-                onClick={generateSummary}>Создать
-        </button>
+        <div>
+          <button type="button" className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10"
+                  onClick={generateSummary}>Создать
+          </button>
 
-        <button type="button"
-                style={{ display: "none" }}
-                className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
-                onClick={clear}>Заполнить
-        </button>
+          <button type="button"
+                  style={{ display: "none" }}
+                  className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
+                  onClick={createNames}>Заполнить
+          </button>
+        </div>
+        <div className="versionText">
+          Создал VaultBoy для ТП Тетрики, (v0.4, 01.05.2023).
+        </div>
       </div>
-      <div className="d-flex justify-end" style={{ color: "white", fontSize: "14px" }}>
-        Создал VaultBoy для ТП Тетрики, (v0.4, 01.05.2023).
-      </div>
-    </div>
+    </AppContext.Provider>
   );
 }
 
