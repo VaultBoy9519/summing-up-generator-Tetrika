@@ -214,7 +214,7 @@ function App() {
           </button>
 
           <button type="button"
-                  style={{ display: "none" }}
+                  style={{ display: "inline-block" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Заполнить
           </button>
