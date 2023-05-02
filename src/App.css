@@ -114,3 +114,22 @@ body {
         justify-content: center;
     }
 }
+
+@media (max-width: 382px) {
+    h5 {
+        font-size: 16px;
+    }
+
+    .titleGen {
+        font-size: 20px;
+        margin-bottom: 0px;
+    }
+
+    .lessonInfo {
+        font-size: 17px;
+    }
+
+    .otherInfo {
+        font-size: 15px;
+    }
+}
