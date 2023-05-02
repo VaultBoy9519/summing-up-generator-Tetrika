@@ -8,12 +8,12 @@ const LessonInfo = ({ onCreateLesson }) => {
   const [formValues, setFormValues] = React.useState(formState);
   const [colorForms] = React.useState(formColor);
 
-  const { color } = React.useContext(AppContext);
+  const { color, lesson } = React.useContext(AppContext);
 
   const handleInputChange = (event) => {
     const value = event.target.value;
     const name = event.target.name;
-    setFormValues({ ...formValues, [name]: value });
+    setFormValues({ ...lesson, [name]: value });
   };
 
   React.useEffect(() => {
@@ -28,12 +28,7 @@ const LessonInfo = ({ onCreateLesson }) => {
     onCreateLesson(formValues, colorForms);
   }, [formValues, colorForms]);
 
-  const testFunction = () => {
-    console.log(`Дочерний объект`);
-  };
-
   const formSelectArr = [
-    "Статус урока",
     "Неявка У (РУ)",
     "Неявка У (ВУ)",
     "Неявка П (РУ)",
@@ -44,13 +39,14 @@ const LessonInfo = ({ onCreateLesson }) => {
     "Завершено"
   ];
 
+
   const formSelectedCreate = formSelectArr.map((form, index) => {
-    return <option value={index}>{formSelectArr[index]}</option>
+    return <option key={index + 1} value={index + 1}>{formSelectArr[index]}</option>
       ;
   });
 
   return (
-    <AppContext.Provider value={{ color, handleInputChange, testFunction }}>
+    <AppContext.Provider value={{ color, lesson, handleInputChange }}>
       <div>
         <div className="lessonInfo">
           Информация об уроке
@@ -72,8 +68,9 @@ const LessonInfo = ({ onCreateLesson }) => {
         </div>
 
         <div>
-          <select className="form-select" name="statusLesson" aria-label="statusLessonToggle"
+          <select className="form-select" value={lesson.statusLesson} name="statusLesson"
                   onChange={handleInputChange}>
+            <option value="">Выбрать статус урока</option>
             {formSelectedCreate}
           </select>
         </div>

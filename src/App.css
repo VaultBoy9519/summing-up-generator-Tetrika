@@ -39,9 +39,8 @@ body {
 }
 
 .versionText {
-    position: fixed;
-    right: 5px;
-    bottom: 5px;
+    display: flex;
+    justify-content: end;
     color: white;
     font-size: 14px;
 }
@@ -85,8 +84,8 @@ body {
 
     .versionText {
         display: flex;
-        justify-content: end;
-        position: relative;
+        justify-content: flex-end;
+        align-items: flex-end;
         right: auto;
         bottom: auto;
     }
@@ -116,6 +115,14 @@ body {
     }
 }
 
+.button-div {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 5px;
+    margin-left: 12px;
+    margin-right: 12px;
+}
+
 @media (max-width: 382px) {
     h5 {
         font-size: 16px;
@@ -135,6 +142,6 @@ body {
     }
 
     .btn-lg {
-        width: 92%
+        width: 100%
     }
 }

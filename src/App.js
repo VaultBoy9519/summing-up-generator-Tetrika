@@ -29,16 +29,13 @@ function App() {
 
   //отвечает за раскрашивание input-линий
   const highlightInput = () => {
-    console.log(arrNullValues);
     for (let name of arrNullValues) {
       setColor(prevState => ({ ...prevState, [name]: "yellow" }));
-      console.log(setColor);
       setTimeout(
         () => (setColor(prevState => ({ ...prevState, [name]: "white" }))),
         800
       );
     }
-    console.log(lesson);
   };
 
   let tutorFullName = [];
@@ -149,28 +146,37 @@ function App() {
     }
   };
 
-  const clear = () => {
-    const obj = {};
-    for (let key in optRecs) {
-      obj[key] = false;
-    }
-    setOptRecs(obj);
-    console.log(optRecs);
+
+  const setCheckReset = () => {
+    const reset = (obj, setObj, value) => {
+      let reset = {};
+      for (let element in obj) {
+        reset[element] = value;
+        setObj(reset);
+      }
+    };
+    reset(lesson, setLesson, "");
+    reset(optRecs, setOptRecs, false);
+    setMessageToPupil("");
+    setMessageToTutor("");
   };
 
-  const { testFunction } = React.useContext(AppContext);
 
 //автозаполнение объекта с инфой об уроке
   const createNames = () => {
-    lesson.dateLesson = `18:00 четверг, 31 февраля`;
-    lesson.nameTutor = `Тест Тестович Тетрилин`;
-    lesson.idPupil = `Ливерная Голубка 14`;
-    lesson.namePupil = `Тест Ева`;
+    const obj = {
+      dateLesson: `18:00 четверг, 01 февраля`,
+      nameTutor: `Тест Тестович Тетрилин`,
+      idPupil: `Ливерная Голубка 14`,
+      namePupil: `Тест Ева`,
+      statusLesson: "1"
+    };
+    setLesson(obj);
   };
 
 
   return (
-    <AppContext.Provider value={{ color }}>
+    <AppContext.Provider value={{ color, optRecs, lesson }}>
       <div className="App">
         <Header />
         <div>
@@ -208,19 +214,24 @@ function App() {
             </div>
           </div>
         </div>
-        <div>
-          <button type="button" className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10"
+        <div className="button-div">
+          <button type="button" className="btn btn-secondary bg-gradient btn-lg w-200 mx-auto mx-lg-0 mt-10"
                   onClick={generateSummary}>Создать
           </button>
-
+          <button type="button"
+                  className="btn btn-secondary bg-gradient btn-lg mx-auto mx-lg-0 mt-10 ml-10"
+                  onClick={setCheckReset}>Очистить
+          </button>
           <button type="button"
                   style={{ display: "none" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={createNames}>Заполнить
+                  onClick={createNames}>Тестовые У и П
           </button>
         </div>
-        <div className="versionText">
-          Создал VaultBoy для ТП Тетрики, (v0.4, 01.05.2023).
+        <div>
+          <div className="versionText">
+            Создал VaultBoy для ТП Тетрики, (v0.5, 03.05.2023).
+          </div>
         </div>
       </div>
     </AppContext.Provider>

@@ -16,15 +16,16 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
   }, []);
 
   React.useEffect(() => {
+  }, [optRecs]);
+
+  React.useEffect(() => {
     onCheckOptRecs(checkboxValues);
   }, [checkboxValues]);
 
   //при выборе чекбокса, его значение будет менять состояние checkboxValue на противоположное
   const handleCheckboxChange = (event) => {
     const name = event.target.name;
-    setCheckboxValues({ ...checkboxValues, [name]: !(checkboxValues[name]) });
-    console.log(event.target.name);
-    console.log(checkboxValues);
+    setCheckboxValues({ ...optRecs, [name]: !(checkboxValues[name]) });
   };
 
   function PropsCreator(nameTutor, namePupil, text) {
@@ -43,10 +44,9 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
     />;
   });
 
-  const { testFunction } = React.useContext(AppContext);
 
   return (
-    <AppContext.Provider value={{ handleCheckboxChange }}>
+    <AppContext.Provider value={{ handleCheckboxChange, optRecs }}>
       <div>
         <p className="lessonInfo mt-10 mb-0">
           Доп. рекомендации
@@ -58,11 +58,6 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
         <div className="otherInfo">
           {checkboxesList}
         </div>
-        <button type="button"
-                style={{ display: "none" }}
-                className="btn btn-primary btn-lg w-200 mx-auto mx-lg-0 mt-10 ml-10"
-                onClick={testFunction}>Заполнить
-        </button>
       </div>
     </AppContext.Provider>
   );
