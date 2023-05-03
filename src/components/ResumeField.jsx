@@ -1,9 +1,10 @@
 import React from "react";
 import ClipboardJS from "clipboard";
 
-const ResumeField = ({ userRole, message }) => {
+const ResumeField = ({ userRole, message, renewMessage, renew }) => {
   const copyButtonRef = React.useRef(null);
   const [isCopied, setIsCopied] = React.useState(false);
+  const [messageText, setMessageText] = React.useState("");
 
   React.useEffect(() => {
     const clipboard = new ClipboardJS(copyButtonRef.current);
@@ -17,6 +18,24 @@ const ResumeField = ({ userRole, message }) => {
       clipboard.destroy();
     };
   }, []);
+
+  React.useEffect(() => {
+    setMessageText(message);
+    if (renew === true) {
+      setMessageText(message);
+    }
+  }, [message, renew]);
+
+
+  React.useEffect(() => {
+    if (messageText !== message) {
+      renewMessage(message, messageText);
+    }
+  }, [message, messageText]);
+
+  const handleText = (event) => {
+    setMessageText(event.target.value);
+  };
 
   const greenOkSvg = (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="16" height="16">
@@ -41,16 +60,14 @@ const ResumeField = ({ userRole, message }) => {
     <div>
       <div className="card">
         <div className="d-flex justify-between border">
-          <h5 className="ml-5 mt-5">Резюмирование для {userRole}</h5>
-          <a ref={copyButtonRef} className="btn btn-outline-secondary" data-clipboard-text={message}>
+          <h5 className="ml-10 mt-5">Резюмирование для {userRole}</h5>
+          <a ref={copyButtonRef} className="btn btn-outline-secondary" data-clipboard-text={messageText}>
             {isCopied ? greenOkSvg : copySvg}
           </a>
         </div>
-
-        <div className="card-body">
-          <p className="card-text"
-             style={{ height: "150px", overflow: "auto", whiteSpace: "pre-line", textAlign: "justify" }}>{message}</p>
-        </div>
+        <></>
+        <textarea className="form-control textarea" disabled={message === ""} value={messageText}
+                  onChange={handleText}></textarea>
       </div>
     </div>
   );

@@ -15,11 +15,25 @@ function App() {
   const [optRecs, setOptRecs] = React.useState({});
   const [lesson, setLesson] = React.useState({});
   const [color, setColor] = React.useState({});
+  const [renew, setRenew] = React.useState(true);
 
-  //Колбэки для получения пропсов из Index
+  //Колбэки для получения пропсов из LessonInfo
   const onCreateLesson = (formValues, colorForms) => {
     setLesson(formValues);
     setColor(colorForms);
+  };
+
+  //три функции ниже отвечают за ререндер при нажатии кнопки
+  //"Создать", если кто-то хочет вернуть данные после изменений
+  const checkRenew = (message, messageText) => {
+    setRenew(false);
+  };
+
+  const renewMessagePupil = (message, messageText) => {
+    checkRenew(message, messageText);
+  };
+  const renewMessageTutor = (message, messageText) => {
+    checkRenew(message, messageText);
   };
 
   //Колбэк для получения пропса из OptionalRecs
@@ -123,9 +137,7 @@ function App() {
     //Если есть незаполненные input, названия добавляются в массив
     for (let name in lesson) {
       if (lesson[name] === "") {
-        if (arrNullValues.includes(name)) {
-          continue;
-        } else {
+        if (!arrNullValues.includes(name)) {
           arrNullValues.push(name);
         }
       }
@@ -142,10 +154,9 @@ function App() {
 
       setMessageToPupil(createFullMessage("Pupil"));
       setMessageToTutor(createFullMessage("Tutor"));
-
+      setRenew(true);
     }
   };
-
 
   const setCheckReset = () => {
     const reset = (obj, setObj, value) => {
@@ -172,6 +183,7 @@ function App() {
       statusLesson: "1"
     };
     setLesson(obj);
+    console.log(messageToPupil);
   };
 
 
@@ -201,12 +213,16 @@ function App() {
                     <ResumeField
                       userRole={"ученика"}
                       message={messageToPupil}
+                      renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
+                      renew={renew}
                     />
                   </div>
                   <div className="col-lg-12">
                     <ResumeField
                       userRole={"преподавателя"}
                       message={messageToTutor}
+                      renewMessage={(message, messageText) => renewMessageTutor(message, messageText)}
+                      renew={renew}
                     />
                   </div>
                 </div>
@@ -225,12 +241,12 @@ function App() {
           <button type="button"
                   style={{ display: "none" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={createNames}>Тестовые У и П
+                  onClick={createNames}>Тест
           </button>
         </div>
         <div>
           <div className="versionText">
-            Создал VaultBoy для ТП Тетрики, (v0.5, 03.05.2023).
+            Создал VaultBoy для ТП Тетрики, (v1.0, 03.05.2023).
           </div>
         </div>
       </div>
