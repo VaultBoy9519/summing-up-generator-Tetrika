@@ -13,11 +13,14 @@ const LessonInfo = ({ onCreateLesson }) => {
   const handleInputChange = (event) => {
     const value = event.target.value;
     const name = event.target.name;
+    console.log(formValues);
     setFormValues({ ...lesson, [name]: value });
   };
 
   React.useEffect(() => {
     const elements = document.getElementsByClassName("form-control");
+    console.log(`Форма`);
+    console.log(formState);
     for (let element of elements) {
       formColor[element.name] = "white";
       formState[element.name] = "";

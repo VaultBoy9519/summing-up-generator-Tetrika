@@ -66,19 +66,18 @@ body {
 
 .textarea {
     border: 0;
-    margin-bottom: 0px;
+    padding: 10px;
     resize: none;
     overflow: auto;
     height: 100%;
 
 }
 
-textarea.form-control:focus {
-    border-color: none;
-    box-shadow: none;
+textarea:focus {
+    outline: none;
 }
 
-textarea.form-control:disabled {
+textarea:disabled {
     background-color: white;
 }
 

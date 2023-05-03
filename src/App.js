@@ -142,6 +142,8 @@ function App() {
         }
       }
     }
+    console.log(arrNullValues);
+    console.log(lesson);
 
     //в случае, если массив не пустой, input с соответствующим
     //названием подсвечивается желтым и функция завершается, иначе формируется сообщение
@@ -151,11 +153,14 @@ function App() {
       return;
     } else {
       createStatusMessage();
-
       setMessageToPupil(createFullMessage("Pupil"));
       setMessageToTutor(createFullMessage("Tutor"));
+      console.log(messageToPupil);
+      console.log(messageToTutor);
       setRenew(true);
     }
+    console.log(messageToPupil);
+    console.log(messageToTutor);
   };
 
   const setCheckReset = () => {
@@ -183,7 +188,7 @@ function App() {
       statusLesson: "1"
     };
     setLesson(obj);
-    console.log(messageToPupil);
+    console.log(lesson);
   };
 
 

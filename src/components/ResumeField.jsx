@@ -22,6 +22,7 @@ const ResumeField = ({ userRole, message, renewMessage, renew }) => {
   React.useEffect(() => {
     setMessageText(message);
     if (renew === true) {
+      console.log(message);
       setMessageText(message);
     }
   }, [message, renew]);
@@ -66,7 +67,7 @@ const ResumeField = ({ userRole, message, renewMessage, renew }) => {
           </a>
         </div>
         <></>
-        <textarea className="form-control textarea" disabled={message === ""} value={messageText}
+        <textarea className="textarea" disabled={message === ""} value={messageText}
                   onChange={handleText}></textarea>
       </div>
     </div>
