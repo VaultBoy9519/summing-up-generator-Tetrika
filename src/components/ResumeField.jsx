@@ -22,7 +22,6 @@ const ResumeField = ({ userRole, message, renewMessage, renew }) => {
   React.useEffect(() => {
     setMessageText(message);
     if (renew === true) {
-      console.log(message);
       setMessageText(message);
     }
   }, [message, renew]);
