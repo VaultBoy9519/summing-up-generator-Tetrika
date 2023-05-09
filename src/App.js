@@ -66,11 +66,12 @@ function App() {
     const dateAndTime = `${parseInt(adminkaDateLesson[1], 10)} ${adminkaDateLesson[2]} в ${adminkaDateLesson[0]}`;
     if (lesson.nameTutor !== undefined) {
       tutorFullName = lesson.nameTutor.split(" ");
+      tutorFullName.pop();
     }
 
     //Функция выполняется в следующей, безымянной. Нужна для формирования полного фрагмента после установки статуса
     const setStatusLessonMessage = (pupilMessage, tutorMessage) => {
-      const startInfoPupil = `\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${tutorFullName[0]} ${tutorFullName[1]}), `;
+      const startInfoPupil = `\n\nУрок, назначенный на ${dateAndTime} по Мск (преподаватель ${tutorFullName.join(" ")}), `;
       const startInfoTutor = `\n\nУрок, назначенный на ${dateAndTime} по Мск (ученик ${lesson.namePupil} ${lesson.idPupil}), `;
       return statusFragment = [`${startInfoPupil}${pupilMessage}`,
         `${startInfoTutor}${tutorMessage}`];
