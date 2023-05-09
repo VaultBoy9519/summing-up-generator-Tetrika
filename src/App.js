@@ -172,16 +172,53 @@ function App() {
   };
 
 
-//автозаполнение объекта с инфой об уроке
+  // const handleClick = () => {
+  //   window.addEventListener("message", function(event) {
+  //     if (event.data.type === "GET_DATA_RESPONSE") {
+  //       console.log("Response from extension:", event.data.response);
+  //     }
+  //   });
+  //   window.postMessage({ type: "GET_DATA" }, "*");
+  // };
+
+  const handleClick = () => {
+    window.postMessage(
+      {
+        type: "FROM_PAGE",
+        data: {}
+      },
+      "*"
+    );
+  };
+
+  window.addEventListener("message", (event) => {
+    if (event.source !== window) {
+      return;
+    }
+
+    if (event.data.type !== "FROM_CONTENT") {
+      return;
+    }
+
+    console.log("Response from extension:", event.data.data);
+    setLesson(event.data.data);
+  });
+
+// Запрос загрузки контентного скрипта
+  window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
+
+
+  //автозаполнение объекта с инфой об уроке
   const createNames = () => {
-    const obj = {
-      dateLesson: `18:00 четверг, 01 февраля`,
-      nameTutor: `Тест Тестович Тетрилин`,
-      idPupil: `Ливерная Голубка 14`,
-      namePupil: `Тест Ева`,
-      statusLesson: "1"
-    };
-    setLesson(obj);
+    // const obj = {
+    //   dateLesson: `18:00 четверг, 01 февраля`,
+    //   nameTutor: `Тест Тестович Тетрилин`,
+    //   idPupil: `Ливерная Голубка 14`,
+    //   namePupil: `Тест Ева`,
+    //   statusLesson: "1"
+    // };
+    // setLesson(obj);
+    handleClick();
   };
 
 
@@ -237,7 +274,7 @@ function App() {
                   onClick={setCheckReset}>Очистить
           </button>
           <button type="button"
-                  style={{ display: "none" }}
+                  style={{ display: "inline-block" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Тест
           </button>

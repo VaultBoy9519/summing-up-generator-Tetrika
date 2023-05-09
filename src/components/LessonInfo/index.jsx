@@ -83,3 +83,51 @@ const LessonInfo = ({ onCreateLesson }) => {
 export default LessonInfo;
 
 
+// const createLessonInfo = new Promise((resolve, reject) => {
+//   chrome.cookies.get({ url: "https://tetrika-school.ru", name: "login" }, (cookie) => {
+//     if (cookie) {
+//       getData(cookie, "https://tetrika-school.ru/adminka/lessons/70be3ed3-a659-4329-b6e0-51d5faf5e5bb")
+//         .then((doc) => {
+//           const lessonInfo = {};
+//           const dateTimeElement = doc.querySelector(".datetime_me__without-ms");
+//           const linkTutor = `https://tetrika-school.ru${doc.querySelector("a[href*=\"/adminka/tutors/\"]").getAttribute("href")}`;
+//           const linkPupil = `https://tetrika-school.ru${doc.querySelector("a[href*=\"/adminka/pupils/\"]").getAttribute("href")}`;
+//           if (dateTimeElement) {
+//             const dateTimeText = dateTimeElement.textContent.trim();
+//             const dateTime = new Date(dateTimeText);
+//             const moscowTime = (new Date(dateTime.getTime() + 180 * 60 * 1000)).toLocaleString();
+//             const dateLesson = moment(moscowTime, "DD.MM.YYYY, HH:mm:ss").format("HH:mm dddd, DD MMMM");
+//             lessonInfo.dateLesson = dateLesson;
+//           } else {
+//             reject(`dateTimeElement not found`);
+//           }
+//
+//           // Вызываем getData еще раз здесь
+//           return getData(cookie, linkTutor);
+//         })
+//         .then((doc) => {
+//           // Обработка результата getData
+//           // Добавляем информацию в lessonInfo
+//           lessonInfo.tutorName = doc.querySelector(".name-block__full-name").textContent.trim();
+//           lessonInfo.tutorLink = linkTutor;
+//
+//           // Вызываем getData еще раз здесь
+//           return getData(cookie, linkPupil);
+//         })
+//         .then((doc) => {
+//           // Обработка результата getData
+//           // Добавляем информацию в lessonInfo
+//           lessonInfo.pupilName = doc.querySelector(".name-block__full-name").textContent.trim();
+//           lessonInfo.pupilLink = linkPupil;
+//
+//           // Возвращаем lessonInfo в цепочку промисов
+//           resolve(lessonInfo);
+//         })
+//         .catch((error) => {
+//           reject(error);
+//         });
+//     } else {
+//       reject(`Cookie not found`);
+//     }
+//   });
+// });
