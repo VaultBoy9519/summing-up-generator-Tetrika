@@ -11,12 +11,25 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         let linkPupil;
 
         const getDocumentHtml = (link) => {
+
+          const docCreator = (html) => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, "text/html");
+            return doc;
+          };
+
           return fetch(link)
-            .then(response => response.text())
-            .then(html => {
-              const parser = new DOMParser();
-              const doc = parser.parseFromString(html, "text/html");
-              return doc;
+            .then(response => {
+              if (response.status == 403) {
+                console.log(`Ошибка 403`);
+                return fetch("https://tetrika-school.ru/go_back")
+                  .then(() => {
+                    console.log(`Повторный запрос`);
+                    return fetch(link);
+                  }).then(response => response.text())
+                  .then(html => docCreator(html));
+              }
+              return response.text().then(html => docCreator(html));
             });
         };
 
@@ -24,16 +37,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           const doc = await getDocumentHtml(link);
           const userID = doc.querySelector(".badge-secondary.js-copy-btn").textContent.trim();
           await fetch("https://tetrika-school.ru/adminka/users_search/" + userID, { "credentials": "include" })
-            .then(r => {
-              if (r.status == 403) {
-                return fetch("https://tetrika-school.ru/go_back", { "credentials": "include" })
-                  .then(() => {
-                    return fetch("https://tetrika-school.ru/adminka/users_search/" + userID, {
-                      "credentials": "include"
-                    }).then(r => r.json());
-                  });
-              }
-              return r.json();
+            .then(response => {
+              return response.json();
             })
             .then(json => {
               const jsonObj = json.users[0];
@@ -56,7 +61,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               }
             });
         };
-
 
         getDocumentHtml("https://tetrika-school.ru/adminka/lessons/0a47c1e8-0fc5-4e1a-a294-12bdea7ec830")
           .then(
@@ -133,7 +137,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           });
 
       } else {
-        sendResponse(`Cookie not found`);
+        sendResponse(`Access denied`);
         reject(`Cookie not found`);
       }
     });
