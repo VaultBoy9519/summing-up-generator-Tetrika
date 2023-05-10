@@ -1,6 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Extention_SuG",
+  "name": "Tetrika SuG Extension",
+  "description": "Расширение позволяет генератору резюмирования делать запросы в админку и получать ответ",
   "version": "1.0",
   "icons": {
     "128": "logo.png"

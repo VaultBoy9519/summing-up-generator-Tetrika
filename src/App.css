@@ -12,7 +12,7 @@ body {
     font-family: 'Russo One';
     font-size: 24px;
     color: white;
-    margin-bottom: 10px;
+    margin-bottom: 5px;
 }
 
 .otherInfo {
@@ -20,6 +20,10 @@ body {
     font-size: 16px;
     color: white;
 
+}
+
+.headerText {
+    margin-right: 100px;
 }
 
 .titleGen {
@@ -34,9 +38,8 @@ body {
 }
 
 .card {
-    margin-top: 40px;
     margin-bottom: 10px;
-    height: 225px;
+    height: 231px;
 }
 
 .versionText {
@@ -51,17 +54,26 @@ body {
     word-wrap: break-word;
 }
 
-.form-control {
-    margin-bottom: 15px;
+.input-style {
+    margin-bottom: 10px;
 }
 
 .margin > div:first-child {
-    margin-right: 15px;
+    margin-right: 10px;
 }
 
 .elementMargin {
     margin-top: 8px;
-    margin-bottom: 26px;
+    margin-bottom: 4px;
+}
+
+.btn-email {
+    height: 70%;
+    line-height: 70%;
+    width: 220px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .textarea {
@@ -81,6 +93,7 @@ textarea:disabled {
     background-color: white;
 }
 
+
 @media (max-width: 500px) {
     .btn-lg {
         width: 95%
@@ -96,8 +109,7 @@ textarea:disabled {
 @media (max-width: 900px) {
 
     .card {
-        margin-top: 10px;
-        margin-bottom: 0px;
+        margin-bottom: 10px;
     }
 
     .versionText {
@@ -106,6 +118,10 @@ textarea:disabled {
         align-items: flex-end;
         right: auto;
         bottom: auto;
+    }
+
+    .headerText {
+        margin-right: 0px;
     }
 }
 
@@ -131,6 +147,7 @@ textarea:disabled {
         justify-content: center;
         font-size: 12px;
     }
+
 }
 
 .button-div {
@@ -140,6 +157,14 @@ textarea:disabled {
     margin-left: 12px;
     margin-right: 12px;
 }
+
+@media (max-width: 480px) {
+    .btn-email {
+        width: 100px;
+    }
+    
+}
+
 
 @media (max-width: 382px) {
     h5 {
@@ -162,4 +187,5 @@ textarea:disabled {
     .btn-lg {
         width: 100%
     }
+
 }

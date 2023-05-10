@@ -7,6 +7,7 @@ import { finishFragmentMessage, messages } from "./objects/messages";
 import { statusInfoPupil, statusInfoTutor } from "./objects/statusInfo";
 import LessonInfo from "./components/LessonInfo";
 import AppContext from "./components/AppContext";
+import { TutorCash } from "./components/TutorCash";
 
 function App() {
 
@@ -16,16 +17,23 @@ function App() {
   const [lesson, setLesson] = React.useState({});
   const [color, setColor] = React.useState({});
   const [renew, setRenew] = React.useState(true);
+  const [link, setLink] = React.useState("");
+  const [colorLink, setColorLink] = React.useState("white");
+  const [emailPupil, setEmailPupil] = React.useState("E-mail");
+  const [emailTutor, setEmailTutor] = React.useState("E-mail");
+  const [tutorCash, setTutorCash] = React.useState(`0`);
+  const [messageCompens, setMessageCompens] = React.useState("");
 
   //Колбэки для получения пропсов из LessonInfo
-  const onCreateLesson = (formValues, colorForms) => {
+  const onCreateLesson = (formValues, colorForms, lessonLink) => {
     setLesson(formValues);
     setColor(colorForms);
+    setLink(lessonLink);
   };
 
   //три функции ниже отвечают за ререндер при нажатии кнопки
   //"Создать", если кто-то хочет вернуть данные после изменений
-  const checkRenew = (message, messageText) => {
+  const checkRenew = () => {
     setRenew(false);
   };
 
@@ -52,6 +60,14 @@ function App() {
     }
   };
 
+  const highlightInputLink = (color, timeout) => {
+    setColorLink(color);
+    setTimeout(
+      () => (setColorLink("white")),
+      timeout
+    );
+  };
+
   let tutorFullName = [];
   let statusFragment = ["", ""];
 
@@ -64,10 +80,12 @@ function App() {
       return !dayOfWeek.includes(n.replace(",", ""));
     });
     const dateAndTime = `${parseInt(adminkaDateLesson[1], 10)} ${adminkaDateLesson[2]} в ${adminkaDateLesson[0]}`;
-    if (lesson.nameTutor !== undefined) {
-      tutorFullName = lesson.nameTutor.split(" ");
-      tutorFullName.pop();
+    if (lesson.statusLesson === "1" || lesson.statusLesson === "7") {
+      lesson.statusLesson === "1" ? setTutorCash(Number(lesson.tutorCash) - 125) : setTutorCash(Number(lesson.tutorCash));
+      setMessageCompens(`Компенсация за отмену урока из-за тех. проблемы ${dateAndTime} (Мск) с ID ${lesson.idPupil}`);
     }
+    tutorFullName = lesson.nameTutor.split(" ");
+    tutorFullName.pop();
 
     //Функция выполняется в следующей, безымянной. Нужна для формирования полного фрагмента после установки статуса
     const setStatusLessonMessage = (pupilMessage, tutorMessage) => {
@@ -138,8 +156,10 @@ function App() {
     //Если есть незаполненные input, названия добавляются в массив
     for (let name in lesson) {
       if (lesson[name] === "") {
-        if (!arrNullValues.includes(name)) {
-          arrNullValues.push(name);
+        if (name !== "tutorCash" && name !== "emailPupil" && name !== "emailTutor") {
+          if (!arrNullValues.includes(name)) {
+            arrNullValues.push(name);
+          }
         }
       }
     }
@@ -150,6 +170,7 @@ function App() {
     if (arrNullValues.length > 0) {
       highlightInput();
       return;
+
     } else {
       createStatusMessage();
       setMessageToPupil(createFullMessage("Pupil"));
@@ -162,48 +183,70 @@ function App() {
     const reset = (obj, setObj, value) => {
       let reset = {};
       for (let element in obj) {
-        reset[element] = value;
-        setObj(reset);
+        if (element === "statusLesson") {
+          reset[element] = "0";
+        } else {
+          reset[element] = value;
+        }
       }
+      setObj(reset);
     };
     reset(lesson, setLesson, "");
     reset(optRecs, setOptRecs, false);
+    setLink("");
+    setTutorCash(0);
+    setMessageCompens("");
     setMessageToPupil("");
     setMessageToTutor("");
+    setEmailPupil("E-mail");
+    setEmailTutor("E-mail");
   };
 
-
-  // const handleClick = () => {
-  //   window.addEventListener("message", function(event) {
-  //     if (event.data.type === "GET_DATA_RESPONSE") {
-  //       console.log("Response from extension:", event.data.response);
-  //     }
-  //   });
-  //   window.postMessage({ type: "GET_DATA" }, "*");
-  // };
-
-  const handleClick = () => {
-    window.postMessage(
-      {
-        type: "FROM_PAGE",
-        data: {}
-      },
-      "*"
-    );
-  };
-
-  window.addEventListener("message", (event) => {
-    if (event.source !== window) {
-      return;
+  React.useEffect(() => {
+    let timerId;
+    let receivedResponse = false;
+    if (link !== "") {
+      timerId = setTimeout(() => {
+        if (!receivedResponse) {
+          highlightInputLink("red", 4000);
+          console.log("Ответ не был получен в течение 8 секунд");
+          setLink("");
+        }
+      }, 8000);
+      window.postMessage(
+        {
+          type: "FROM_PAGE",
+          data: { link: link }
+        },
+        "*"
+      );
     }
-
-    if (event.data.type !== "FROM_CONTENT") {
-      return;
-    }
-
-    console.log("Response from extension:", event.data.data);
-    setLesson(event.data.data);
-  });
+    window.addEventListener("message", (event) => {
+      if (event.source !== window) {
+        return;
+      }
+      if (event.data.type !== "FROM_CONTENT") {
+        return;
+      }
+      receivedResponse = true;
+      // console.log("Response from extension:", event.data.data);
+      const data = event.data.data;
+      if (typeof data === "object") {
+        setLesson(data);
+        setEmailPupil(data.emailPupil);
+        setEmailTutor(data.emailTutor);
+      } else if (data === `404 Not Found`) {
+        setLink("");
+        highlightInputLink("yellow", 3000);
+      } else if (data === `Access denied` || data === undefined) {
+        setLink("");
+        highlightInputLink("orange", 1000);
+      }
+    });
+    return () => {
+      clearTimeout(timerId);
+    };
+  }, [link]);
 
 // Запрос загрузки контентного скрипта
   window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
@@ -219,12 +262,11 @@ function App() {
     //   statusLesson: "1"
     // };
     // setLesson(obj);
-    handleClick();
   };
 
 
   return (
-    <AppContext.Provider value={{ color, optRecs, lesson }}>
+    <AppContext.Provider value={{ color, optRecs, lesson, link, colorLink }}>
       <div className="App">
         <Header />
         <div>
@@ -232,9 +274,10 @@ function App() {
             <div className="row">
               <div className="col-lg-4">
                 <div className="row">
-                  <div className="col-lg-12 elementMargin">
-                    <LessonInfo onCreateLesson={(formValues, colorForms) => onCreateLesson(formValues, colorForms)}
-                                arrNullValues={arrNullValues}
+                  <div className="col-lg-12">
+                    <LessonInfo
+                      onCreateLesson={(formValues, colorForms, lessonLink) => onCreateLesson(formValues, colorForms, lessonLink)}
+                      arrNullValues={arrNullValues}
                     />
                   </div>
                   <div className="col-lg-12">
@@ -245,20 +288,28 @@ function App() {
               </div>
               <div className="col-lg-8">
                 <div className="row">
+                  <div className="lessonInfo">
+                    Резюмирование и компенсация
+                  </div>
                   <div className="col-lg-12">
                     <ResumeField
                       userRole={"ученика"}
                       message={messageToPupil}
                       renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
                       renew={renew}
+                      emailUser={emailPupil}
                     />
                   </div>
+                  <TutorCash
+                    tutorCash={tutorCash}
+                    messageCompens={messageCompens} />
                   <div className="col-lg-12">
                     <ResumeField
                       userRole={"преподавателя"}
                       message={messageToTutor}
                       renewMessage={(message, messageText) => renewMessageTutor(message, messageText)}
                       renew={renew}
+                      emailUser={emailTutor}
                     />
                   </div>
                 </div>
@@ -267,7 +318,8 @@ function App() {
           </div>
         </div>
         <div className="button-div">
-          <button type="button" className="btn btn-secondary bg-gradient btn-lg w-200 mx-auto mx-lg-0 mt-10"
+          <button type="button"
+                  className="btn btn-secondary bg-gradient btn-lg w-200 mx-auto mx-lg-0 mt-10"
                   onClick={generateSummary}>Создать
           </button>
           <button type="button"
@@ -275,14 +327,15 @@ function App() {
                   onClick={setCheckReset}>Очистить
           </button>
           <button type="button"
-                  style={{ display: "inline-block" }}
+                  style={{ display: "none" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Тест
           </button>
         </div>
         <div>
           <div className="versionText">
-            Создал VaultBoy для ТП Тетрики, (v1.0, 03.05.2023).
+            Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.3, 11.05.2023).
           </div>
         </div>
       </div>

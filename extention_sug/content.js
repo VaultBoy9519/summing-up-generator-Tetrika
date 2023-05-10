@@ -15,7 +15,7 @@ window.addEventListener("message", (event) => {
 
   isWaitingForResponse = true; // Устанавливаем флаг, что мы отправили запрос
 
-  chrome.runtime.sendMessage({ type: "FROM_CONTENT" }, (response) => {
+  chrome.runtime.sendMessage({ type: "FROM_CONTENT", data: event.data.data }, (response) => {
     isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
     window.postMessage({ type: "FROM_CONTENT", data: response }, "*");
   });

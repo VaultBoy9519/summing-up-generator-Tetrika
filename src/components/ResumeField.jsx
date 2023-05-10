@@ -1,22 +1,29 @@
 import React from "react";
 import ClipboardJS from "clipboard";
 
-const ResumeField = ({ userRole, message, renewMessage, renew }) => {
-  const copyButtonRef = React.useRef(null);
-  const [isCopied, setIsCopied] = React.useState(false);
+const ResumeField = ({ userRole, message, renewMessage, renew, emailUser }) => {
+  const copyButtonTextRef = React.useRef(null);
+  const copyButtonEmailRef = React.useRef(null);
+  const [textIsCopied, setTextIsCopied] = React.useState(false);
+  const [emailIsCopied, setEmailIsCopied] = React.useState(false);
   const [messageText, setMessageText] = React.useState("");
 
-  React.useEffect(() => {
-    const clipboard = new ClipboardJS(copyButtonRef.current);
+  const copyInfo = (setter, ref) => {
+    const clipboard = new ClipboardJS(ref.current);
     clipboard.on("success", () => {
-      setIsCopied(true);
+      setter(true);
       setTimeout(() => {
-        setIsCopied(false);
+        setter(false);
       }, 1000);
     });
     return () => {
       clipboard.destroy();
     };
+  };
+
+  React.useEffect(() => {
+    copyInfo(setTextIsCopied, copyButtonTextRef);
+    copyInfo(setEmailIsCopied, copyButtonEmailRef);
   }, []);
 
   React.useEffect(() => {
@@ -60,10 +67,17 @@ const ResumeField = ({ userRole, message, renewMessage, renew }) => {
     <div>
       <div className="card">
         <div className="d-flex justify-between border">
-          <h5 className="ml-10 mt-5">Резюмирование для {userRole}</h5>
-          <a ref={copyButtonRef} className="btn btn-outline-secondary" data-clipboard-text={messageText}>
-            {isCopied ? greenOkSvg : copySvg}
-          </a>
+          <h5 className="ml-10 mt-5">Для {userRole}</h5>
+          <div>
+            <button ref={copyButtonEmailRef} disabled={emailUser === `E-mail`} className="btn btn-email btn-secondary"
+                    data-clipboard-text={emailUser}>
+              {emailIsCopied ? `E-mail скопирован!` : emailUser}
+            </button>
+            <a ref={copyButtonTextRef} className="btn btn-secondary ml-10"
+               data-clipboard-text={messageText}>
+              {textIsCopied ? greenOkSvg : copySvg}
+            </a>
+          </div>
         </div>
         <></>
         <textarea className="textarea" disabled={message === ""} value={messageText}

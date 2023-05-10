@@ -6,19 +6,20 @@ const LessonInfo = ({ onCreateLesson }) => {
   const formState = {};
   const formColor = {};
   const [formValues, setFormValues] = React.useState(formState);
+  const [lessonLink, setLessonLink] = React.useState("");
   const [colorForms] = React.useState(formColor);
-
-  const { color, lesson } = React.useContext(AppContext);
+  const [firstRender, setFirstRender] = React.useState(true);
+  const { color, lesson, link, colorLink } = React.useContext(AppContext);
 
   const handleInputChange = (event) => {
     const value = event.target.value;
     const name = event.target.name;
-    console.log(formValues);
     setFormValues({ ...lesson, [name]: value });
   };
 
   React.useEffect(() => {
-    const elements = document.getElementsByClassName("form-control");
+    setFirstRender(false);
+    const elements = document.getElementsByClassName("lesson-input");
     for (let element of elements) {
       formColor[element.name] = "white";
       formState[element.name] = "";
@@ -26,10 +27,11 @@ const LessonInfo = ({ onCreateLesson }) => {
   }, []);
 
   React.useEffect(() => {
-    onCreateLesson(formValues, colorForms);
-  }, [formValues, colorForms]);
+    onCreateLesson(formValues, colorForms, lessonLink);
+  }, [formValues, colorForms, lessonLink]);
 
   const formSelectArr = [
+    "Выбрать статус урока",
     "Неявка У (РУ)",
     "Неявка У (ВУ)",
     "Неявка П (РУ)",
@@ -40,19 +42,44 @@ const LessonInfo = ({ onCreateLesson }) => {
     "Завершено"
   ];
 
+  React.useEffect(() => {
+    if (firstRender) {
+      setFirstRender(false);
+      return;
+    }
+    if (link === "") {
+      setLessonLink(link);
+    }
+  }, [link, firstRender]);
+
+  React.useEffect(() => {
+    if (lesson !== formValues) {
+      setFormValues(lesson);
+    }
+  }, [lessonLink, firstRender]);
+
 
   const formSelectedCreate = formSelectArr.map((form, index) => {
-    return <option key={index + 1} value={index + 1}>{formSelectArr[index]}</option>
+    return <option key={index} value={index}>{formSelectArr[index]}</option>
       ;
   });
 
   return (
-    <AppContext.Provider value={{ color, lesson, handleInputChange }}>
+    <AppContext.Provider value={{ color, lesson, colorLink, handleInputChange }}>
       <div>
         <div className="lessonInfo">
           Информация об уроке
         </div>
-
+        <div>
+          <input className="form-control input-style"
+                 placeholder={colorLink === "white" ? "Ссылка на урок / ID урока" :
+                   colorLink === "yellow" ? "Урок не найден, проверьте ссылку или ID" : colorLink === "red" ? "Админка недоступна" :
+                     "Требуется авторизация"}
+                 style={{ backgroundColor: colorLink }}
+                 value={lessonLink || ""}
+                 onChange={event => setLessonLink(event.target.value)}
+          />
+        </div>
         <InputForm nameInput={"dateLesson"}
                    text={"Дата и время урока (как в админке)"}
                    handleInputChange={handleInputChange} />
@@ -71,7 +98,6 @@ const LessonInfo = ({ onCreateLesson }) => {
         <div>
           <select className="form-select" value={lesson.statusLesson} name="statusLesson"
                   onChange={handleInputChange}>
-            <option value="">Выбрать статус урока</option>
             {formSelectedCreate}
           </select>
         </div>
@@ -81,53 +107,3 @@ const LessonInfo = ({ onCreateLesson }) => {
 };
 
 export default LessonInfo;
-
-
-// const createLessonInfo = new Promise((resolve, reject) => {
-//   chrome.cookies.get({ url: "https://tetrika-school.ru", name: "login" }, (cookie) => {
-//     if (cookie) {
-//       getData(cookie, "https://tetrika-school.ru/adminka/lessons/70be3ed3-a659-4329-b6e0-51d5faf5e5bb")
-//         .then((doc) => {
-//           const lessonInfo = {};
-//           const dateTimeElement = doc.querySelector(".datetime_me__without-ms");
-//           const linkTutor = `https://tetrika-school.ru${doc.querySelector("a[href*=\"/adminka/tutors/\"]").getAttribute("href")}`;
-//           const linkPupil = `https://tetrika-school.ru${doc.querySelector("a[href*=\"/adminka/pupils/\"]").getAttribute("href")}`;
-//           if (dateTimeElement) {
-//             const dateTimeText = dateTimeElement.textContent.trim();
-//             const dateTime = new Date(dateTimeText);
-//             const moscowTime = (new Date(dateTime.getTime() + 180 * 60 * 1000)).toLocaleString();
-//             const dateLesson = moment(moscowTime, "DD.MM.YYYY, HH:mm:ss").format("HH:mm dddd, DD MMMM");
-//             lessonInfo.dateLesson = dateLesson;
-//           } else {
-//             reject(`dateTimeElement not found`);
-//           }
-//
-//           // Вызываем getData еще раз здесь
-//           return getData(cookie, linkTutor);
-//         })
-//         .then((doc) => {
-//           // Обработка результата getData
-//           // Добавляем информацию в lessonInfo
-//           lessonInfo.tutorName = doc.querySelector(".name-block__full-name").textContent.trim();
-//           lessonInfo.tutorLink = linkTutor;
-//
-//           // Вызываем getData еще раз здесь
-//           return getData(cookie, linkPupil);
-//         })
-//         .then((doc) => {
-//           // Обработка результата getData
-//           // Добавляем информацию в lessonInfo
-//           lessonInfo.pupilName = doc.querySelector(".name-block__full-name").textContent.trim();
-//           lessonInfo.pupilLink = linkPupil;
-//
-//           // Возвращаем lessonInfo в цепочку промисов
-//           resolve(lessonInfo);
-//         })
-//         .catch((error) => {
-//           reject(error);
-//         });
-//     } else {
-//       reject(`Cookie not found`);
-//     }
-//   });
-// });

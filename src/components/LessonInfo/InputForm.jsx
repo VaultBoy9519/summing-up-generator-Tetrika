@@ -7,7 +7,7 @@ const InputForm = ({ nameInput, text }) => {
 
   return (
     <div style={{ width: "100%" }}>
-      <input className="form-control"
+      <input className="form-control lesson-input input-style"
              style={{ backgroundColor: color[nameInput] }}
              name={nameInput}
              value={lesson[nameInput] || ""}

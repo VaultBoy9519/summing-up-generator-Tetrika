@@ -49,7 +49,7 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
     <AppContext.Provider value={{ handleCheckboxChange, optRecs }}>
       <div>
         <p className="lessonInfo mt-10 mb-0">
-          Доп. рекомендации
+          Рекомендации
         </p>
         <div className="otherInfo d-flex justify-between p-1">
           <div>П</div>
