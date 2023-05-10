@@ -328,7 +328,7 @@ function App() {
                   onClick={setCheckReset}>Очистить
           </button>
           <button type="button"
-                  style={{ display: "inline-block" }}
+                  style={{ display: "none" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Тест
           </button>
