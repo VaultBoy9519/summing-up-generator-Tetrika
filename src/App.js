@@ -75,7 +75,7 @@ function App() {
   const createStatusMessage = () => {
 
     //Преобразование даты и времени в корректный формат
-    const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье"];
+    const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "воскресение"];
     const adminkaDateLesson = lesson.dateLesson.split(" ").filter((n) => {
       return !dayOfWeek.includes(n.replace(",", ""));
     });
@@ -262,6 +262,7 @@ function App() {
     //   statusLesson: "1"
     // };
     // setLesson(obj);
+    console.log(lesson);
   };
 
 
@@ -327,7 +328,7 @@ function App() {
                   onClick={setCheckReset}>Очистить
           </button>
           <button type="button"
-                  style={{ display: "none" }}
+                  style={{ display: "inline-block" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Тест
           </button>
