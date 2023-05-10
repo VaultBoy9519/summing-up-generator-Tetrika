@@ -336,7 +336,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.3, 11.05.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.4, 11.05.2023).
           </div>
         </div>
       </div>
