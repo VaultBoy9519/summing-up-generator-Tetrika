@@ -6,7 +6,7 @@ const Header = () => {
       <div className="headerLogo justify-content-start d-flex align-center d-none d-md-block">
         <a href="https://drive.google.com/u/0/uc?id=19h10qfy3r58RCdy0Bj23XPjV4cgUPMB6&export=download"
            target="_blank">
-          <img width={90} src="img/logo.png" style={{ cursor: "pointer" }} alt="Logo" />
+          <img width={80} src="img/logo.png" style={{ cursor: "pointer" }} alt="Logo" />
         </a>
       </div>
       <div className="d-flex justify-content-center flex-grow-1 headerText">
