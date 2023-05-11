@@ -1,5 +1,5 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "Tetrika SuG Extension",
   "description": "Расширение позволяет генератору резюмирования делать запросы в админку и получать ответ",
   "version": "1.0",
@@ -7,19 +7,17 @@
     "128": "logo.png"
   },
   "permissions": [
-    "activeTab",
-    "tabs",
+    "tabGroups",
+    "cookies",
+    "activeTab"
+  ],
+  "host_permissions": [
     "http://*/*",
     "https://*/*",
-    "<all_urls>",
-    "cookies"
+    "<all_urls>"
   ],
   "background": {
-    "scripts": [
-      "lib/moment.js",
-      "background.js"
-    ],
-    "persistent": false
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
@@ -27,6 +25,7 @@
         "<all_urls>"
       ],
       "js": [
+        "lib/moment.js",
         "content.js"
       ]
     }

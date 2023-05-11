@@ -10,7 +10,7 @@ const Header = () => {
         </a>
       </div>
       <div className="d-flex justify-content-center flex-grow-1 headerText">
-        <p className="titleGen">Генератор резюмирования by VaultBoy</p>
+        <p className="titleGen">Генератор резюмирования</p>
       </div>
     </header>
 
