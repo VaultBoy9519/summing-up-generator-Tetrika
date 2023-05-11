@@ -83,6 +83,9 @@ function App() {
     if (lesson.statusLesson === "1" || lesson.statusLesson === "7") {
       lesson.statusLesson === "1" ? setTutorCash(Number(lesson.tutorCash) - 125) : setTutorCash(Number(lesson.tutorCash));
       setMessageCompens(`Компенсация за отмену урока из-за тех. проблемы ${dateAndTime} (Мск) с ID ${lesson.idPupil}`);
+    } else {
+      setTutorCash(0);
+      setMessageCompens("");
     }
     tutorFullName = lesson.nameTutor.split(" ");
     tutorFullName.pop();
@@ -209,10 +212,10 @@ function App() {
       timerId = setTimeout(() => {
         if (!receivedResponse) {
           highlightInputLink("red", 4000);
-          console.log("Ответ не был получен в течение 8 секунд");
+          console.log("Ответ не был получен в течение 12 секунд");
           setLink("");
         }
-      }, 8000);
+      }, 12000);
       window.postMessage(
         {
           type: "FROM_PAGE",
@@ -336,7 +339,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.4, 11.05.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.5, 11.05.2023).
           </div>
         </div>
       </div>
