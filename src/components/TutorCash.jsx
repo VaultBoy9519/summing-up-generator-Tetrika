@@ -31,13 +31,13 @@ export const TutorCash = ({ tutorCash, messageCompens, link }) => {
       <span className="input-group-text" style={{ fontWeight: "bold" }}>{isNaN(tutorCash) ? 0 : tutorCash}</span>
       <input className="form-control" defaultValue={messageCompens || ""}
              placeholder="Сумма на доплату + текст для компенса преподу" />
-      <button ref={copyButtonRefID} className="btn btn-secondary" style={{ width: "40px" }}
-              data-clipboard-text={link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link}>
-        {isCopiedID ? greenOkSvg : `ID`}
-      </button>
       <button ref={copyButtonRefText} className="btn btn-secondary" style={{ width: "125px" }}
               data-clipboard-text={messageCompens}>
         {isCopiedText ? `Скопировано` : `Копировать`}
+      </button>
+      <button ref={copyButtonRefID} className="btn btn-secondary" style={{ width: "40px" }}
+              data-clipboard-text={link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link}>
+        {isCopiedID ? greenOkSvg : `ID`}
       </button>
     </div>
 
