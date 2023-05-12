@@ -1,6 +1,5 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
-
   if (request.type !== "FROM_CONTENT") {
     return;
   }
@@ -15,16 +14,24 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   const createLessonInfo = new Promise((resolve, reject) => {
     chrome.cookies.get({ url: "https://tetrika-school.ru", name: "login" }, (cookie) => {
       if (cookie) {
+
+        chrome.offscreen.createDocument({
+          url: chrome.runtime.getURL("offscreen.html"),
+          reasons: ["CLIPBOARD"],
+          justification: "testing the offscreen API"
+        });
+
         const lessonInfo = {};
         let linkTutor;
         let linkPupil;
 
         const getDocumentHtml = (link) => {
 
-          const docCreator = (html) => {
-            const parser = new DOMParser();
-            const doc = parser.parseFromString(html, "text/html");
-            return doc;
+          const send = (html) => {
+            chrome.runtime.sendMessage({ type: "FROM_SERVICE_WORKER", data: html }, (response) => {
+              console.log(`Ответ: `, response);
+              return response;
+            });
           };
 
           try {
@@ -37,9 +44,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                       console.log(`Повторный запрос`);
                       return fetch(link);
                     }).then(response => response.text())
-                    .then(html => docCreator(html));
+                    .then(html => send(html));
                 }
-                return response.text().then(html => docCreator(html));
+                return response.text().then(html => send(html));
               });
           } catch (error) {
             console.log(`Урок не найден`);
@@ -168,5 +175,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 });
 
 
-
-
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+  createLessonInfo.then(sendResponse, (error) => {
+    console.log(error);
+  });
+  return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно
+});

@@ -306,7 +306,8 @@ function App() {
                   </div>
                   <TutorCash
                     tutorCash={tutorCash}
-                    messageCompens={messageCompens} />
+                    messageCompens={messageCompens}
+                    link={link} />
                   <div className="col-lg-12">
                     <ResumeField
                       userRole={"преподавателя"}
@@ -339,7 +340,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.5, 11.05.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.6, 12.05.2023).
           </div>
         </div>
       </div>

@@ -1,15 +1,13 @@
 import React from "react";
 import ClipboardJS from "clipboard";
 
-export const useCopyButton = (setter, ref) => {
-  const [isCopied, setIsCopied] = React.useState(false);
-  const copyButtonRef = React.useRef(null);
-  const copyInfo = () => {
-    const clipboard = new ClipboardJS(copyButtonRef.current);
+export const useCopyButton = () => {
+  const copyInfo = (ref, setter) => {
+    const clipboard = new ClipboardJS(ref.current);
     clipboard.on("success", () => {
-      setIsCopied(true);
+      setter(true);
       setTimeout(() => {
-        setIsCopied(false);
+        setter(false);
       }, 1000);
     });
     return () => {
@@ -17,5 +15,5 @@ export const useCopyButton = (setter, ref) => {
     };
   };
 
-  return { isCopied, copyButtonRef, copyInfo };
+  return { copyInfo };
 };

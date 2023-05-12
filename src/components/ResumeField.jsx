@@ -1,5 +1,6 @@
 import React from "react";
 import ClipboardJS from "clipboard";
+import AppContext from "./AppContext";
 
 const ResumeField = ({ userRole, message, renewMessage, renew, emailUser }) => {
   const copyButtonTextRef = React.useRef(null);
@@ -64,26 +65,28 @@ const ResumeField = ({ userRole, message, renewMessage, renew, emailUser }) => {
   );
 
   return (
-    <div>
-      <div className="card">
-        <div className="d-flex justify-between border">
-          <h5 className="ml-10 mt-5">Для {userRole}</h5>
-          <div>
-            <button ref={copyButtonEmailRef} disabled={emailUser === `E-mail`} className="btn btn-email btn-secondary"
-                    data-clipboard-text={emailUser}>
-              {emailIsCopied ? `E-mail скопирован!` : emailUser}
-            </button>
-            <a ref={copyButtonTextRef} className="btn btn-secondary ml-10"
-               data-clipboard-text={messageText}>
-              {textIsCopied ? greenOkSvg : copySvg}
-            </a>
+    <AppContext.Provider value={{ greenOkSvg }}>
+      <div>
+        <div className="card">
+          <div className="d-flex justify-between border">
+            <h5 className="ml-10 mt-5">Для {userRole}</h5>
+            <div>
+              <button ref={copyButtonEmailRef} disabled={emailUser === `E-mail`} className="btn btn-email btn-secondary"
+                      data-clipboard-text={emailUser}>
+                {emailIsCopied ? `E-mail скопирован!` : emailUser}
+              </button>
+              <a ref={copyButtonTextRef} className="btn btn-secondary ml-10"
+                 data-clipboard-text={messageText}>
+                {textIsCopied ? greenOkSvg : copySvg}
+              </a>
+            </div>
           </div>
+          <></>
+          <textarea className="textarea" disabled={message === ""} value={messageText}
+                    onChange={handleText}></textarea>
         </div>
-        <></>
-        <textarea className="textarea" disabled={message === ""} value={messageText}
-                  onChange={handleText}></textarea>
       </div>
-    </div>
+    </AppContext.Provider>
   );
 };
 
