@@ -257,14 +257,14 @@ function App() {
 
   //автозаполнение объекта с инфой об уроке
   const createNames = () => {
-    // const obj = {
-    //   dateLesson: `18:00 четверг, 01 февраля`,
-    //   nameTutor: `Тест Тестович Тетрилин`,
-    //   idPupil: `Ливерная Голубка 14`,
-    //   namePupil: `Тест Ева`,
-    //   statusLesson: "1"
-    // };
-    // setLesson(obj);
+    const obj = {
+      dateLesson: `18:00 четверг, 01 февраля`,
+      nameTutor: `Тест Тестович Тетрилин`,
+      idPupil: `Ливерная Голубка 14`,
+      namePupil: `Тест Ева`,
+      statusLesson: "1"
+    };
+    setLesson(obj);
     console.log(lesson);
   };
 

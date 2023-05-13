@@ -13,22 +13,31 @@ export const TutorCash = ({ tutorCash, messageCompens, link }) => {
     </svg>
   );
   const { copyInfo } = useCopyButton();
+
   const [isCopiedText, setIsCopiedText] = React.useState(false);
   const [isCopiedID, setIsCopiedID] = React.useState(false);
+  const [isCopiedCash, setIsCopiedCash] = React.useState(false);
+
 
   const copyButtonRefText = React.useRef(null);
   const copyButtonRefID = React.useRef(null);
+  const copyButtonRefCash = React.useRef(null);
+
 
   React.useEffect(() => {
       copyInfo(copyButtonRefText, setIsCopiedText);
       copyInfo(copyButtonRefID, setIsCopiedID);
+      copyInfo(copyButtonRefCash, setIsCopiedCash);
     }
   );
 
   return (
     <div className="input-group mb-10">
-      <span className="input-group-text">₽</span>
-      <span className="input-group-text" style={{ fontWeight: "bold" }}>{isNaN(tutorCash) ? 0 : tutorCash}</span>
+      <span className="input-group-text bg-secondary border-0">₽</span>
+      <button ref={copyButtonRefCash} className="btn btn-secondary" style={{ fontWeight: "bold", width: "50px" }}
+              data-clipboard-text={tutorCash}>
+        {isCopiedCash ? greenOkSvg : isNaN(tutorCash) ? 0 : tutorCash}
+      </button>
       <input className="form-control" defaultValue={messageCompens || ""}
              placeholder="Сумма на доплату + текст для компенса преподу" />
       <button ref={copyButtonRefText} className="btn btn-secondary" style={{ width: "125px" }}
