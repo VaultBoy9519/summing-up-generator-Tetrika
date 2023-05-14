@@ -18,6 +18,15 @@ Mozilla Firefox: https://www.mozilla.org/ru/firefox/new/
 Более подробно с установкой браузера вы можете ознакомиться в этих статьях:
 https://tetrikasupp.notion.site/Windows-bcc2b1b95f4849d59bf8a9024e011f37
 https://tetrikasupp.notion.site/Mac-ff3f6f8346e541669122d88def2042b4`,
+  mobileAndBrowserRec: [`\n\nСогласно тесту оборудования, вы проводите занятия через мобильное устройство. По правилам школы, преподаватель может вести уроки только с использованием компьютера или ноутбука.`,
+    `\n\nИспользуемый вами браузер не подходит для занятий. Используйте, пожалуйста, Google Chrome или Mozilla Firefox. Скачать их из Google Play Market вы можете по этим ссылкам:
+
+Google Chrome - https://play.google.com/store/apps/details?id=com.android.chrome&hl=ru&gl=US
+Mozilla Firefox - https://play.google.com/store/apps/details?id=org.mozilla.firefox&hl=ru&gl=US
+
+Для устройств от компании Apple вы можете использовать стандартный браузер Safari.
+
+Более подробно с установкой браузера вы можете ознакомиться в этой статье: https://tetrikasupp.notion.site/Android-27fa5d85fd294beba2941fda74df000a`],
   hardwareRec: `\n\nУстройство, которое вы используете, не подходит для занятий по системным требованиям, указанным в договоре-оферте. Для комфортных уроков рекомендую сменить его на более современное.
 
 Для выбора устройства ознакомьтесь, пожалуйста, с системными требованиями по ссылке ниже:

@@ -22,6 +22,10 @@ body {
 
 }
 
+.optMargin {
+    margin-top: 41px;
+}
+
 .btn-border {
     border: 1px black;
 }
@@ -127,6 +131,12 @@ textarea:disabled {
     .headerText {
         margin-right: 0px;
     }
+
+    .optMargin {
+        margin-top: 5px;
+        margin-bottom: 5px
+    }
+
 }
 
 @media (max-width: 528px) {

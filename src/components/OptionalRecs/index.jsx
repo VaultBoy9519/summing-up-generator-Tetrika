@@ -25,7 +25,16 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
   //при выборе чекбокса, его значение будет менять состояние checkboxValue на противоположное
   const handleCheckboxChange = (event) => {
     const name = event.target.name;
-    setCheckboxValues({ ...optRecs, [name]: !(checkboxValues[name]) });
+    const isChecked = event.target.checked;
+
+    if (name === "checkBrowserMobilePupil" && isChecked) {
+      setCheckboxValues({ ...optRecs, [name]: true, checkBrowserPupil: false });
+    } else if (name === "checkBrowserPupil" && isChecked) {
+      setCheckboxValues({ ...optRecs, [name]: true, checkBrowserMobilePupil: false });
+    } else {
+      setCheckboxValues({ ...optRecs, [name]: isChecked });
+    }
+
   };
 
   function PropsCreator(nameTutor, namePupil, text) {
@@ -48,11 +57,9 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
   return (
     <AppContext.Provider value={{ handleCheckboxChange, optRecs }}>
       <div>
-        <p className="lessonInfo mt-10 mb-0">
-          Рекомендации
-        </p>
-        <div className="otherInfo d-flex justify-between p-1">
+        <div className="otherInfo d-flex align-end justify-between p-1">
           <div>П</div>
+          <div className="lessonInfo mb-0">Рекомендации</div>
           <div>У</div>
         </div>
         <div className="otherInfo">

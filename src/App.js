@@ -121,13 +121,19 @@ function App() {
     for (let i = 0; i < optRecsKeys.length - 1; i++) {
       const messageRecs = messages[messagesKeys[i]];
       if (optRecs[optRecsKeys[i]] === true) {
-        if (Array.isArray(messageRecs)) {
+        if (Array.isArray(messageRecs) && i === optRecsKeys.length - 2) {
           if (roleUser === "Pupil") {
             arrMessage.push(statusFragment[0]);
             arrMessage.push(messageRecs[1]);
           } else {
             arrMessage.push(messageRecs[0]);
             arrMessage.push(statusFragment[1]);
+          }
+        } else if (Array.isArray(messageRecs)) {
+          if (roleUser === "Pupil") {
+            arrMessage.push(messageRecs[1]);
+          } else {
+            arrMessage.push(messageRecs[0]);
           }
         } else {
           arrMessage.push(messageRecs);
@@ -212,10 +218,10 @@ function App() {
       timerId = setTimeout(() => {
         if (!receivedResponse) {
           highlightInputLink("red", 4000);
-          console.log("Ответ не был получен в течение 12 секунд");
+          console.log("Ответ не был получен в течение 15 секунд");
           setLink("");
         }
-      }, 12000);
+      }, 15000);
       window.postMessage(
         {
           type: "FROM_PAGE",
@@ -284,7 +290,7 @@ function App() {
                       arrNullValues={arrNullValues}
                     />
                   </div>
-                  <div className="col-lg-12">
+                  <div className="col-lg-12 optMargin">
                     <OptionalRecs onCheckOptRecs={checkboxValues => onCheckOptRecs(checkboxValues)}
                                   optRecs={optRecs} />
                   </div>
@@ -340,7 +346,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.8, 14.05.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9, 15.05.2023).
           </div>
         </div>
       </div>
