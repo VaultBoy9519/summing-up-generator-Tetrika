@@ -18,6 +18,7 @@
     "scripts": [
       "lib/moment.js",
       "background.js",
+      "filterNamePupil.js",
       "node_modules/cyrillic-to-translit-js/dist/bundle.js"
     ],
     "persistent": false

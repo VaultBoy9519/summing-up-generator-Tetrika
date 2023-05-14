@@ -38,7 +38,7 @@ export const TutorCash = ({ tutorCash, messageCompens, link }) => {
               data-clipboard-text={tutorCash}>
         {isCopiedCash ? greenOkSvg : isNaN(tutorCash) ? 0 : tutorCash}
       </button>
-      <input className="form-control" defaultValue={messageCompens || ""}
+      <input className="form-control" value={messageCompens || ""}
              placeholder="Сумма на доплату + текст для компенса преподу" />
       <button ref={copyButtonRefText} className="btn btn-secondary" style={{ width: "125px" }}
               data-clipboard-text={messageCompens}>
