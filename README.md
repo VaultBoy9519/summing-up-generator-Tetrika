@@ -1,70 +1,15 @@
-# Getting Started with Create React App
+# Генератор резюмирования
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Для чего нужен
+Данное приложение позволяет создать тело письма для ученика и преподавателя в рамках регламентов технической поддержки онлайн-школы "Тетрика". Это упрощает работу технической поддержки и ускоряет ее эффективность во много раз.
 
-## Available Scripts
+## Как пользоваться
 
-In the project directory, you can run:
+1. Если у вас нет доступа к меню администратора по адресу https://tetrika-school.ru/adminka - шаг можно пропустить. Если есть - установить расширение для браузера по ссылке https://drive.google.com/open?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&authuser=0 (пока в Google-магазине отсутствует). 
+2. Перейти по ссылке https://vaultboy9519.github.io/summing-up-generator-Tetrika/ на страницу приложения
+3. В случае установленного расширения вы можете вставить ID урока или ссылку на урок из админки в строку "Ссылка на урок/ID урока". В результате приложение подтянет все нужные данные из урока, включая имена, ID пользователей, а также статус урока. После этого вам останется только прощелкать опциональные галочки и нажать "Создать". Если пункт 1 пропущен, то данные нужно ввести вручную в соответствующие поля.
+4. Все данные со страницы кликабельны, и автоматически копируются в буфер обмена.
+5. Более подробно с работой приложения можно ознакомиться тут - https://www.youtube.com/watch?v=w_rUvOgVP9g
 
-### `npm start`
-
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
-
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
-
-### `npm test`
-
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## Разработка
+Приложение полностью адаптивно как под десктоп-устройства, так и для мобильных устройств. Написано с использованием ReactJS и библиотеки Bootstrap v5.0.2. Расширение написано на JS, Manifest v2.
