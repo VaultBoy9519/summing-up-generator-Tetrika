@@ -7,21 +7,20 @@ import optionalRecs from "../pom/OptionalRecs";
 import { messagesText } from "../messages";
 
 //v0.1 от 20.06.2023. Работает только ручной режим ввода
+const lesson = {
+  link: "https://tetrika-school.ru/adminka/lessons/0e20d91c-8329-4fd9-8962-44420e3a4935",
+  id: "0e20d91c-8329-4fd9-8962-44420e3a4935",
+  date: "11:00 понедельник, 08 мая",
+  finalDate: "8 мая в 11:00",
+  tutorFullName: "Оксана Алексеевна Хозяйкина",
+  tutorName: "Оксана",
+  tutorNameAndMiddle: "Оксана Алексеевна",
+  pupilName: "Ляля",
+  pupilId: "Серая савка 60",
+  status: "Выбрать статус урока"
+};
 
 describe("Тестирование генератора в ручном режиме", () => {
-
-  const lesson = {
-    link: "https://tetrika-school.ru/adminka/lessons/0e20d91c-8329-4fd9-8962-44420e3a4935",
-    id: "0e20d91c-8329-4fd9-8962-44420e3a4935",
-    date: "11:00 понедельник, 08 мая",
-    finalDate: "8 мая в 11:00",
-    tutorFullName: "Оксана Алексеевна Иванова",
-    tutorName: "Оксана",
-    tutorNameAndMiddle: "Оксана Алексеевна",
-    pupilName: "Екатерина",
-    pupilId: "Серая савка 60",
-    status: "Выбрать статус урока"
-  };
 
   const messages = messagesText(lesson);
 
@@ -218,6 +217,28 @@ describe("Тестирование генератора в ручном режи
 
   it("Проверка статуса 'Закончено'", () => {
     checkCreateStatus(8, messages.finish.pupil, messages.finish.tutor);
+  });
+
+});
+
+describe.only(`Тестирование генератора в автоматическом режиме`, () => {
+
+  beforeEach(() => {
+    cy.postAuth();
+    cy.visit("https://tetrika-school.ru/adminka");
+    cy.wait(3000);
+    cy.visit("http://localhost:3000/summing-up-generator-Tetrika");
+
+
+    cy.get("p.titleGen").should("contain.text", "Генератор резюмирования");
+  });
+
+  it("Тестовый запуск", () => {
+    lessonInfo
+      .typeLessonLink("1");
+
+
+    cy.wait(20000);
   });
 
 });

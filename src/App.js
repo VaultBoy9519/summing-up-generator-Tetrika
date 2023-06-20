@@ -229,6 +229,7 @@ function App() {
         },
         "*"
       );
+      console.log(`Запрос отправлен`);
     }
     window.addEventListener("message", (event) => {
       if (event.source !== window) {

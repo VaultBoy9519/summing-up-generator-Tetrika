@@ -14,11 +14,24 @@ Cypress.Commands.add("postAuth", () => {
     url: "https://tetrika-school.ru/auth/email_login",
     form: true,
     body: {
-      email: "vadim.bykadorov@tetrika.school",
-      password: "c9UkJmdL",
+      email: "",
+      password: "",
       action: "enter"
     }
   });
 });
 
-
+Cypress.Commands.add("startListeningToExtensionMessages", () => {
+  cy.window().then((win) => {
+    win.addEventListener("message", (event) => {
+      const { data } = event;
+      if (data.action === "getCookieValue") {
+        const cookieName = data.cookieName;
+        cy.getCookie(cookieName).then((cookie) => {
+          const cookieValue = cookie ? cookie.value : null;
+          win.postMessage({ value: cookieValue }, event.origin);
+        });
+      }
+    });
+  });
+});
