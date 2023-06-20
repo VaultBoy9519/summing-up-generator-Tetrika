@@ -33,18 +33,27 @@ export const TutorCash = ({ tutorCash, messageCompens, link }) => {
 
   return (
     <div className="input-group mb-10">
-      <span className="input-group-text bg-secondary border-0">₽</span>
-      <button ref={copyButtonRefCash} className="btn btn-secondary" style={{ fontWeight: "bold", width: "50px" }}
+      <span className="input-group-text bg-secondary border-0" style={{ color: "white" }}>₽</span>
+      <button ref={copyButtonRefCash} className="btn btn-secondary"
+              name="copyCashButton"
+              style={{ fontWeight: "bold", width: "50px" }}
               data-clipboard-text={tutorCash}>
         {isCopiedCash ? greenOkSvg : isNaN(tutorCash) ? 0 : tutorCash}
       </button>
-      <input className="form-control" readOnly style={{ backgroundColor: "white" }} defaultValue={messageCompens || ""}
+      <input className="form-control" name="messageCompensText" readOnly style={{ backgroundColor: "white" }}
+             defaultValue={messageCompens || ""}
              placeholder="Сумма на доплату + текст для компенса преподу" />
-      <button ref={copyButtonRefText} className="btn btn-secondary" style={{ width: "125px" }}
+      <button ref={copyButtonRefText}
+              name="copyMessageButton"
+              className="btn btn-secondary"
+              style={{ width: "125px" }}
               data-clipboard-text={messageCompens}>
         {isCopiedText ? `Скопировано` : `Копировать`}
       </button>
-      <button ref={copyButtonRefID} className="btn btn-secondary" style={{ width: "40px" }}
+      <button ref={copyButtonRefID}
+              name="copyIdButton"
+              className="btn btn-secondary"
+              style={{ width: "40px" }}
               data-clipboard-text={link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link}>
         {isCopiedID ? greenOkSvg : `ID`}
       </button>

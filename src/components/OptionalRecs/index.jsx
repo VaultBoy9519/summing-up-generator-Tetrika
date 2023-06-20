@@ -56,7 +56,7 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
 
   return (
     <AppContext.Provider value={{ handleCheckboxChange, optRecs }}>
-      <div>
+      <div className="optionalRecsComponent">
         <div className="otherInfo d-flex align-end justify-between p-1">
           <div>П</div>
           <div className="lessonInfo mb-0">Рекомендации</div>

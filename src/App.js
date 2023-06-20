@@ -296,12 +296,12 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div className="col-lg-8">
+              <div className="col-lg-8 resumeFields">
                 <div className="row">
                   <div className="lessonInfo">
                     Резюмирование и компенсация
                   </div>
-                  <div className="col-lg-12">
+                  <div className="col-lg-12 resumePupil">
                     <ResumeField
                       userRole={"ученика"}
                       message={messageToPupil}
@@ -310,11 +310,13 @@ function App() {
                       emailUser={emailPupil}
                     />
                   </div>
-                  <TutorCash
-                    tutorCash={tutorCash}
-                    messageCompens={messageCompens}
-                    link={link} />
-                  <div className="col-lg-12">
+                  <div className="tutorCashComponent">
+                    <TutorCash
+                      tutorCash={tutorCash}
+                      messageCompens={messageCompens}
+                      link={link} />
+                  </div>
+                  <div className="col-lg-12 resumeTutor">
                     <ResumeField
                       userRole={"преподавателя"}
                       message={messageToTutor}
@@ -328,16 +330,19 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="button-div">
+        <div className="button-div mainButtons">
           <button type="button"
+                  name="createButton"
                   className="btn btn-secondary bg-gradient btn-lg w-200 mx-auto mx-lg-0 mt-10"
                   onClick={generateSummary}>Создать
           </button>
           <button type="button"
+                  name="clearButton"
                   className="btn btn-secondary bg-gradient btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={setCheckReset}>Очистить
           </button>
           <button type="button"
+                  name="testButton"
                   style={{ display: "none" }}
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={createNames}>Тест
@@ -346,7 +351,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9, 15.05.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.1, 19.06.2023).
           </div>
         </div>
       </div>

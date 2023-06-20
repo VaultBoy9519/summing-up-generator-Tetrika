@@ -66,12 +66,12 @@ const LessonInfo = ({ onCreateLesson }) => {
 
   return (
     <AppContext.Provider value={{ color, lesson, colorLink, handleInputChange }}>
-      <div>
+      <div className="lessonInfoComponent">
         <div className="lessonInfo">
           Информация об уроке
         </div>
         <div>
-          <input className="form-control input-style"
+          <input name="lessonLink" className="form-control input-style"
                  placeholder={colorLink === "white" ? "Ссылка на урок / ID урока" :
                    colorLink === "yellow" ? "Урок не найден, проверьте ссылку или ID" : colorLink === "red" ? "Админка недоступна" :
                      "Требуется авторизация"}

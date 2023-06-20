@@ -72,10 +72,12 @@ const ResumeField = ({ userRole, message, renewMessage, renew, emailUser }) => {
             <h5 className="ml-10 mt-5">Для {userRole}</h5>
             <div>
               <button ref={copyButtonEmailRef} disabled={emailUser === `E-mail`} className="btn btn-email btn-secondary"
+                      name="copyEmailButton"
                       data-clipboard-text={emailUser}>
                 {emailIsCopied ? `E-mail скопирован!` : emailUser}
               </button>
               <a ref={copyButtonTextRef} className="btn btn-secondary ml-10"
+                 name="copyTextButton"
                  data-clipboard-text={messageText}>
                 {textIsCopied ? greenOkSvg : copySvg}
               </a>
