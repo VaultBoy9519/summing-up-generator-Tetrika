@@ -6,21 +6,51 @@ import resumeFieldTutor from "../pom/ResumeFieldTutor";
 import optionalRecs from "../pom/OptionalRecs";
 import { messagesText } from "../messages";
 
-//v0.1 от 20.06.2023. Работает только ручной режим ввода
+const { fakerRU } = require("@faker-js/faker");
+
+
+//v0.2 от 21.06.2023.
+
+function getRandomNumber(min, max) {
+  return Math.round(Math.random() * (max - min)) + min;
+}
+
+function getRandomClock(min, max) {
+  const randomNumber = Math.round(Math.random() * (max - min)) + min;
+  if (randomNumber < 10) {
+    return randomNumber.toString().padStart(2, "0");
+  } else {
+    return randomNumber;
+  }
+}
+
+const tutor = {
+  firstName: fakerRU.person.firstName("male"),
+  middleName: fakerRU.person.middleName("male"),
+  lastName: fakerRU.person.lastName("male")
+};
+
+const month = ["января", "февраля", "марта", "апреля", "мая", "июня", "июля", "августа", "сентября", "октября", "ноября", "декабря"];
+const dateLesson = {
+  clock: `${getRandomClock(0, 23)}:${getRandomClock(0, 59)}`,
+  date: `${getRandomClock(1, 31)}`,
+  weekday: `${fakerRU.date.weekday().toLowerCase()}`,
+  month: `${month[getRandomNumber(0, 11)]}`
+};
+
 const lesson = {
   link: "https://tetrika-school.ru/adminka/lessons/0e20d91c-8329-4fd9-8962-44420e3a4935",
   id: "0e20d91c-8329-4fd9-8962-44420e3a4935",
-  date: "11:00 понедельник, 08 мая",
-  finalDate: "8 мая в 11:00",
-  tutorFullName: "Оксана Алексеевна Хозяйкина",
-  tutorName: "Оксана",
-  tutorNameAndMiddle: "Оксана Алексеевна",
-  pupilName: "Ляля",
-  pupilId: "Серая савка 60",
-  status: "Выбрать статус урока"
+  date: `${dateLesson.clock} ${dateLesson.weekday}, ${dateLesson.date} ${dateLesson.month}`,
+  finalDate: `${parseInt(dateLesson.date, 10)} ${dateLesson.month} в ${dateLesson.clock}`,
+  tutorFullName: `${tutor.firstName} ${tutor.middleName} ${tutor.lastName}`,
+  tutorName: `${tutor.firstName}`,
+  tutorNameAndMiddle: `${tutor.firstName} ${tutor.middleName}`,
+  pupilName: fakerRU.person.firstName(),
+  pupilId: `${fakerRU.color.human()} ${fakerRU.lorem.word()} ${getRandomClock(1, 99)}`
 };
 
-describe("Тестирование генератора в ручном режиме", () => {
+describe.only("Тестирование генератора в ручном режиме", () => {
 
   const messages = messagesText(lesson);
 
@@ -221,7 +251,7 @@ describe("Тестирование генератора в ручном режи
 
 });
 
-describe.only(`Тестирование генератора в автоматическом режиме`, () => {
+describe(`Тестирование генератора в автоматическом режиме`, () => {
 
   beforeEach(() => {
     cy.postAuth();

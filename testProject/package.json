@@ -12,6 +12,7 @@
     "cypress": "^12.14.0"
   },
   "devDependencies": {
+    "@faker-js/faker": "^8.0.2",
     "cypress-browser-extension-plugin": "^0.1.0",
     "cypress-clipboard": "^1.0.3"
   }
