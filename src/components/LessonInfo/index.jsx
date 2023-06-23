@@ -48,7 +48,7 @@ const LessonInfo = ({ onCreateLesson }) => {
       return;
     }
     if (link === "") {
-      setLessonLink(link);
+      setLessonLink(link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link);
     }
   }, [link, firstRender]);
 

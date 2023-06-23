@@ -2,24 +2,24 @@ const filterNamePupil = (name) => {
   const filterWords = ["none", "ноне", "не", "звонить", "вход", "ватсап", "ватсапа", "телеграм", "телеграма", "только", "возможно", "номер"];
   const filterRoles = ["ученик", "ученица", "у", "уч", "сын", `дочь`, "ребенок", "ребёнок"];
   const filterFamily = ["папа", "мама", "родитель", "дедушка", "бабушка", "опекун", "родитель"];
-  const namesYA = ["агафя", "аксиня", "анися", "даря", "лукеря", "наталя", "прасковя", "софя"];
-  const namesIA = ["эленя", "валеря", "меланя", "юля"];
+  const namesClassic = ["агафя", "аксиня", "анися", "даря", "лукеря", "наталя", "прасковя", "софя"];
   const namesUnique = {
+    "эленя": "эления",
     "элена": "елена",
     "василы": "василий",
     "мариа": "мария",
     "олга": "ольга",
-    "оxана": "оксана"
+    "оxана": "оксана",
+    "валеря": "валерия",
+    "меланя": "мелания"
   };
 
   const replaceUniqueName = (item) => {
 
     let cyrillicItem = (/^[a-zA-Z]*$/.test(item)) ? cyrillicToTranslit().reverse(item, " ") : item;
 
-    if (namesYA.includes(cyrillicItem)) {
+    if (namesClassic.includes(cyrillicItem)) {
       return cyrillicItem.replace("я", "ья");
-    } else if (namesIA.includes(cyrillicItem)) {
-      return cyrillicItem.replace("я", "ия");
     } else {
       for (let key in namesUnique) {
         if (key === cyrillicItem) {

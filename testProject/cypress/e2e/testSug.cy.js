@@ -39,8 +39,6 @@ const dateLesson = {
 };
 
 const lesson = {
-  link: "https://tetrika-school.ru/adminka/lessons/0e20d91c-8329-4fd9-8962-44420e3a4935",
-  id: "0e20d91c-8329-4fd9-8962-44420e3a4935",
   date: `${dateLesson.clock} ${dateLesson.weekday}, ${dateLesson.date} ${dateLesson.month}`,
   finalDate: `${parseInt(dateLesson.date, 10)} ${dateLesson.month} в ${dateLesson.clock}`,
   tutorFullName: `${tutor.firstName} ${tutor.middleName} ${tutor.lastName}`,
