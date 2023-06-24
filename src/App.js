@@ -8,6 +8,8 @@ import { statusInfoPupil, statusInfoTutor } from "./objects/statusInfo";
 import LessonInfo from "./components/LessonInfo";
 import AppContext from "./components/AppContext";
 import { TutorCash } from "./components/TutorCash";
+import LogAnalyzer from "./components/LogAnalyzer";
+import Journal from "./components/Journal";
 
 function App() {
 
@@ -23,6 +25,8 @@ function App() {
   const [emailTutor, setEmailTutor] = React.useState("E-mail");
   const [tutorCash, setTutorCash] = React.useState(`0`);
   const [messageCompens, setMessageCompens] = React.useState("");
+  const [logsPupil, setLogsPupil] = React.useState({});
+  const [logsTutor, setLogsTutor] = React.useState({});
 
   //Колбэки для получения пропсов из LessonInfo
   const onCreateLesson = (formValues, colorForms, lessonLink) => {
@@ -73,20 +77,55 @@ function App() {
 
   //функция отвечает только за создание фрагмента со статусом урока
   const createStatusMessage = () => {
-
+    let cash;
     //Преобразование даты и времени в корректный формат
     const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "воскресение"];
     const adminkaDateLesson = lesson.dateLesson.split(" ").filter((n) => {
       return !dayOfWeek.includes(n.replace(",", ""));
     });
     const dateAndTime = `${parseInt(adminkaDateLesson[1], 10)} ${adminkaDateLesson[2]} в ${adminkaDateLesson[0]}`;
-    if (lesson.statusLesson === "1" || lesson.statusLesson === "7") {
-      lesson.statusLesson === "1" ? setTutorCash(Number(lesson.tutorCash) - 125) : setTutorCash(Number(lesson.tutorCash));
-      setMessageCompens(`Компенсация за отмену урока из-за тех. проблемы ${dateAndTime} (Мск) с ID ${lesson.idPupil}`);
-    } else {
-      setTutorCash(0);
-      setMessageCompens("");
-    }
+
+    const createCompensTutor = () => {
+      const formatDate = (date) => {
+        return new Date(`2000-01-01T${date}`);
+      };
+      const lessonDateTime = formatDate(`${adminkaDateLesson[0]}:00`);
+      const beginDateTimePupil = formatDate(logsPupil.beginDate);
+      const endDateTimePupil = formatDate(logsPupil.endDate);
+      const beginDateTimeTutor = formatDate(logsTutor.beginDate);
+      const endDateTimeTutor = formatDate(logsTutor.endDate);
+
+      const setCashTime = () => {
+        switch (Number(lesson.durationLesson)) {
+          case 30 || 45:
+            return 15;
+          case 60 || 120:
+            return 25;
+        }
+      };
+      const cashTime = setCashTime();
+
+      const setCompensAndMessage = (cash) => {
+        setTutorCash(cash);
+        setMessageCompens(`Компенсация за отмену урока из-за тех. проблемы ${dateAndTime} (Мск) с ID ${lesson.idPupil}`);
+      };
+
+      if (lesson.statusLesson === "1") {
+        if (logsPupil.timeCountInLesson !== 0 && logsTutor.timeCountInLesson > cashTime && beginDateTimePupil < endDateTimeTutor) {
+          cash = lesson.tutorCash - 125;
+          setCompensAndMessage(cash);
+        }
+      } else if (lesson.statusLesson === "7") {
+        if (logsPupil.timeCountInLesson !== 0 && logsTutor.timeCountInLesson > cashTime && beginDateTimePupil < endDateTimeTutor) {
+          cash = lesson.tutorCash;
+          setCompensAndMessage(cash);
+        } else {
+          setCompensAndMessage(125);
+        }
+      }
+    };
+    createCompensTutor();
+
     tutorFullName = lesson.nameTutor.split(" ");
     tutorFullName.pop();
 
@@ -101,11 +140,15 @@ function App() {
     //Функция в зависимости от цифры-значения в статусе урока создает сообщение по статусу
     (() => {
       const keysPupil = Object.keys(statusInfoPupil);
-      const keysTutor = Object.keys(statusInfoTutor);
+      const keysTutor = Object.keys(statusInfoTutor());
+
       for (let numberStatus = 0; numberStatus <= keysPupil.length; numberStatus++) {
         if (numberStatus === (Number(lesson.statusLesson) - 1)) {
           const statusPupilValue = statusInfoPupil[keysPupil[numberStatus]];
-          const statusTutorValue = statusInfoTutor[keysTutor[numberStatus]];
+          console.log(`tutorCash: `, tutorCash);
+          const compensMessage = cash === lesson.tutorCash || cash === lesson.tutorCash - 125 ? ` в размере ставки урока` : ``;
+          console.log(`compensMessage: `, compensMessage);
+          const statusTutorValue = statusInfoTutor(compensMessage)[keysTutor[numberStatus]];
           return setStatusLessonMessage(statusPupilValue, statusTutorValue);
         }
       }
@@ -209,6 +252,8 @@ function App() {
     setMessageToTutor("");
     setEmailPupil("E-mail");
     setEmailTutor("E-mail");
+    setLogsPupil({});
+    setLogsTutor({});
   };
 
   React.useEffect(() => {
@@ -231,7 +276,7 @@ function App() {
       );
       console.log(`Запрос отправлен`);
     }
-    window.addEventListener("message", (event) => {
+    window.addEventListener("message", async (event) => {
       if (event.source !== window) {
         return;
       }
@@ -240,11 +285,15 @@ function App() {
       }
       receivedResponse = true;
       // console.log("Response from extension:", event.data.data);
-      const data = event.data.data;
+      const data = await JSON.parse(event.data.data);
       if (typeof data === "object") {
         setLesson(data);
         setEmailPupil(data.emailPupil);
         setEmailTutor(data.emailTutor);
+        setLogsPupil(data.pupilLogs);
+        setLogsTutor(data.tutorLogs);
+
+        console.log(data);
       } else if (data === `404 Not Found`) {
         setLink("");
         highlightInputLink("yellow", 3000);
@@ -297,7 +346,32 @@ function App() {
                   </div>
                 </div>
               </div>
-              <div className="col-lg-8 resumeFields">
+              <div className="col-lg-3 logAnalyzer">
+                <div className="row">
+                  <div className="lessonInfo">
+                    Логи урока
+                  </div>
+                  <div className="col-lg-12">
+                    <LogAnalyzer
+                      logsPupil={logsPupil}
+                      role={"У"}
+                    />
+                  </div>
+                  <div className="col-lg-12">
+                    <Journal
+                      durationLesson={lesson.durationLesson}
+                      journal={lesson.journal}
+                    />
+                  </div>
+                  <div className="col-lg-12">
+                    <LogAnalyzer
+                      logsPupil={logsTutor}
+                      role={"П"}
+                    />
+                  </div>
+                </div>
+              </div>
+              <div className="col-lg-5 resumeFields">
                 <div className="row">
                   <div className="lessonInfo">
                     Резюмирование и компенсация
@@ -352,7 +426,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.1, 19.06.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.2, 24.06.2023).
           </div>
         </div>
       </div>

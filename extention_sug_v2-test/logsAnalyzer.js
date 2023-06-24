@@ -1,4 +1,4 @@
-const logsAnalyzer = (doc, lessonDate, lessonInfo) => {
+const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
   const createWindowLesson = (doc) => {
     const scriptTags = doc.getElementsByTagName("script");
     for (let i = 0; i < scriptTags.length; i++) {
@@ -21,8 +21,8 @@ const logsAnalyzer = (doc, lessonDate, lessonInfo) => {
   const windowLesson = createWindowLesson(doc);
   const loki = new Loki(windowLesson);
   const logs = loki.getLogs();
-  logs.then((result) => {
-    const fullLogs = result;
+  const processLogs = async () => {
+    const fullLogs = await logs;
     //console.log(fullLogs);
 
     const pupilFullLogs = [];
@@ -53,79 +53,102 @@ const logsAnalyzer = (doc, lessonDate, lessonInfo) => {
     const endLessonDate = moment(lessonDate).add(Number(lessonInfo.durationLesson), "minutes").format("HH:mm:ss D MMM(Z)");
 
     const filterLogsInLesson = (fullLogs) => {
-      fullLogs.sort((a, b) => sortLogsByDateTime(a, b));
-      return fullLogs.filter(log => {
-        return log.dateTime >= beforeLessonDate && log.dateTime <= endLessonDate;
-      });
+      //console.log(`fullLogs: `, fullLogs);
+      if (fullLogs.length > 1) {
+        fullLogs.sort((a, b) => sortLogsByDateTime(a, b));
+        return fullLogs.filter(log => {
+          return log.dateTime >= beforeLessonDate && log.dateTime <= endLessonDate;
+        });
+      } else {
+        return fullLogs;
+      }
     };
 
     const pupilLogsLesson = filterLogsInLesson(pupilFullLogs);
     const tutorLogsLesson = filterLogsInLesson(tutorFullLogs);
 
-    //console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson);
-    //console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson);
+    // console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson);
+    // console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson);
 
     const checkLogs = (logs) => {
 
       const dateTransform = (dateTime) => {
-        return moment(dateTime, "HH:mm:ss DD MMM Z").format("D MMMM [в] HH:mm:ss");
+        return moment(dateTime, "HH:mm:ss DD MMM Z").format("HH:mm:ss");
       };
-
-      const beginDate = logs[0].dateTime;
-      const endDate = logs[logs.length - 1].dateTime;
 
       const info = {
         beginDate: "",
-        endDate: dateTransform(endDate),
+        endDate: "",
         timeCountInLesson: 0,
         camera: "",
         micro: "",
         ws_closed: 0
       };
 
-      if (beginDate < formatLessonDate && endDate > formatLessonDate) {
-        info.beginDate = dateTransform(formatLessonDate);
-      } else {
-        info.beginDate = dateTransform(beginDate);
-      }
+      if (logs.length > 1) {
+        const beginDate = logs[0].dateTime;
+        const endDate = logs[logs.length - 1].dateTime;
 
-      if (endDate > formatLessonDate) {
-        const timeCount = moment(endDate, "HH:mm:ss D MMM(Z)").diff(moment(beginDate, "HH:mm:ss D MMM(Z)"), "minutes");
-        info.timeCountInLesson = timeCount;
-      }
-
-      logs.forEach(log => {
-        switch (log.msgKey) {
-          case "no_camera_permission":
-            info.camera = "Нет разрешений камеры";
-            break;
-          case "no_camera":
-            info.camera = "Камера физически отсутствует";
-            break;
-          case "no_microphone_permission":
-            info.micro = "Нет разрешений микрофона";
-            break;
-          case "no_microphone":
-            info.micro = "Микрофон физически отсутствует";
-            break;
-          case "ws_closed":
-            info.ws_closed++;
-            break;
+        if (beginDate < formatLessonDate && endDate > formatLessonDate) {
+          info.beginDate = dateTransform(formatLessonDate);
+        } else {
+          info.beginDate = dateTransform(beginDate);
         }
-      });
+
+        info.endDate = dateTransform(endDate);
+
+        const setTimeCount = (beginDate) => {
+          const timeCount = moment(endDate, "HH:mm:ss D MMM(Z)").diff(moment(beginDate, "HH:mm:ss D MMM(Z)"), "minutes");
+          info.timeCountInLesson = timeCount;
+        };
+
+        if (beginDate > formatLessonDate && endDate > formatLessonDate) {
+          setTimeCount(beginDate);
+        } else if (beginDate < formatLessonDate && endDate > formatLessonDate) {
+          setTimeCount(formatLessonDate);
+        }
+
+        logs.forEach(log => {
+          switch (log.msgKey) {
+            case "no_camera_permission":
+              info.camera = "Нет доступа";
+              break;
+            case "no_camera":
+              info.camera = "Отсутствует";
+              break;
+            case "no_microphone_permission":
+              info.micro = "Нет доступа";
+              break;
+            case "no_microphone":
+              info.micro = "Отсутствует";
+              break;
+            case "ws_closed":
+              info.ws_closed++;
+              break;
+          }
+        });
+      }
+
       return info;
 
     };
 
-    //console.log(`Действия У на уроке: `, checkLogs(pupilFullLogs));
-    //console.log(`Действия П на уроке: `, checkLogs(tutorFullLogs));
+    // //console.log(`Действия У на уроке: `, checkLogs(pupilFullLogs));
+    // //console.log(`Действия П на уроке: `, checkLogs(tutorFullLogs));
 
-    lessonInfo.fullLogs = {
-      pupil: checkLogs(pupilLogsLesson),
-      tutor: checkLogs(tutorLogsLesson)
-    };
+    lessonInfo.pupilLogs = checkLogs(pupilLogsLesson);
+    lessonInfo.tutorLogs = checkLogs(tutorLogsLesson);
 
     return;
 
-  });
+  };
+
+  await processLogs()
+    .then(() => {
+      //console.log(`Получилось`);
+    })
+    .catch((error) => {
+      //console.log(`Не вышло`, error);
+    });
+
 };

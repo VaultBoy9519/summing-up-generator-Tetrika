@@ -138,33 +138,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               const dateLesson = moment(moscowTime.toLocaleString(), "DD.MM.YYYY, HH:mm:ss").format("HH:mm dddd, DD MMMM");
 
               lessonInfo.dateLesson = dateLesson;
-              lessonInfo.tutorCash = generalLessonInfo["ставка урока"];
+              lessonInfo.tutorCash = Number(generalLessonInfo["ставка урока"]);
               lessonInfo.durationLesson = generalLessonInfo["длительность"];
 
               return createUserInfo(linkPupil, "emailPupil");
             })
-
-          .then(() => {
-            return createUserInfo(linkTutor, "emailTutor");
-          })
-          .then(() => {
-            getDocumentHtml(linkLogs)
-              .then(doc => {
-                logsAnalyzer(doc, lessonDate, lessonInfo);
-              });
-          })
-          .then(() => {
-
-
-            function getItemMarkup({ theme, praise, attention, next_plan }) {
+          .then(async () => {
+            const getItemMarkup = (json) => {
               const journal = {
-                theme: theme,
-                praise: praise,
-                attention: attention,
-                next_plan: next_plan
+                theme: "",
+                praise: "",
+                attention: "",
+                next_plan: ""
               };
+
+              if (json !== null) {
+                for (let key in journal) {
+                  journal[key] = json[key];
+                }
+              }
+
               return journal;
-            }
+            };
 
             //Получаем журнал
             fetch(`https://tetrika-school.ru/api/lesson_info/${lessonId}`, { credentials: "include" })
@@ -172,11 +167,19 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               .then(r => {
                 lessonInfo.journal = getItemMarkup(r.payload);
               });
-          })
 
+            await getDocumentHtml(linkLogs)
+              .then(async doc => {
+                await logsAnalyzer(doc, lessonDate, lessonInfo);
+              });
+
+          })
+          .then(() => {
+            return createUserInfo(linkTutor, "emailTutor");
+          })
           .then(() => {
             console.log(lessonInfo);
-            resolve(lessonInfo);
+            resolve(JSON.stringify(lessonInfo));
           })
           .catch((error) => {
             reject(error);
