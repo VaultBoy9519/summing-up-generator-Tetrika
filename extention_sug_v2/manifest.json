@@ -1,8 +1,8 @@
 {
   "manifest_version": 2,
-  "name": "Tetrika SuG Extension v2",
-  "description": "Расширение позволяет генератору резюмирования делать запросы в админку и получать ответ",
-  "version": "1.5",
+  "name": "SuG Extension v2",
+  "description": "Расширение позволяет получать информацию об уроке",
+  "version": "1.6",
   "icons": {
     "128": "logo.png"
   },
@@ -16,9 +16,11 @@
   ],
   "background": {
     "scripts": [
-      "lib/moment.js",
       "background.js",
       "filterNamePupil.js",
+      "loki.js",
+      "logsAnalyzer.js",
+      "lib/moment.js",
       "node_modules/cyrillic-to-translit-js/dist/bundle.js"
     ],
     "persistent": false

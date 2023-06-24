@@ -10,14 +10,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else {
     dataLink = `https://tetrika-school.ru/adminka/lessons/${request.data.link}`;
   }
-  
+
   const createLessonInfo = new Promise((resolve, reject) => {
     chrome.cookies.get({ url: "https://tetrika-school.ru", name: "login" }, (cookie) => {
       if (cookie) {
         const lessonInfo = {};
         let linkTutor;
         let linkPupil;
-
+        const linkLogs = `${dataLink}/loki_logs`;
+        const linkEvents = `${dataLink}/events`;
+        const lessonId = dataLink.includes(`tetrika-school.ru`) ? dataLink.replace("https://tetrika-school.ru/adminka/lessons/", "") : dataLink;
+        let lessonDate;
         const getDocumentHtml = (link) => {
 
           const docCreator = (html) => {
@@ -63,7 +66,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 lessonInfo.nameTutor = tutorFullName.join(" ");
               } else {
                 const namePupil = jsonObj.name;
-                console.log(filterNamePupil(namePupil));
+                // console.log(filterNamePupil(namePupil));
                 lessonInfo.namePupil = filterNamePupil(namePupil);
                 lessonInfo.idPupil = jsonObj.additional_id;
               }
@@ -83,7 +86,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                   for (let i = 0; i < rows.length; i++) {
                     const cells = rows[i].querySelectorAll("td");
                     const key = cells[0].textContent.trim();
-                    if (key === "состояние" || key === "вводный урок" || key === "ставка урока" || key === "назначенное время") {
+                    if (key === "состояние" || key === "вводный урок" || key === "ставка урока" || key === "длительность" || key === "назначенное время") {
                       let value = cells[1].querySelector("dd").textContent.trim();
                       if (Number(value)) {
                         value = Number(value).toFixed();
@@ -130,20 +133,53 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               linkPupil = `https://tetrika-school.ru${doc.querySelector("a[href*=\"/adminka/pupils/\"]").getAttribute("href")}`;
 
               const dateTime = new Date(generalLessonInfo["назначенное время"]);
-              const moscowTime = (new Date(dateTime.getTime() + 180 * 60 * 1000)).toLocaleString();
-              const dateLesson = moment(moscowTime, "DD.MM.YYYY, HH:mm:ss").format("HH:mm dddd, DD MMMM");
+              const moscowTime = new Date(dateTime.getTime() + 180 * 60 * 1000);
+              lessonDate = moscowTime;
+              const dateLesson = moment(moscowTime.toLocaleString(), "DD.MM.YYYY, HH:mm:ss").format("HH:mm dddd, DD MMMM");
 
               lessonInfo.dateLesson = dateLesson;
-              lessonInfo.tutorCash = generalLessonInfo["ставка урока"];
+              lessonInfo.tutorCash = Number(generalLessonInfo["ставка урока"]);
+              lessonInfo.durationLesson = generalLessonInfo["длительность"];
 
               return createUserInfo(linkPupil, "emailPupil");
             })
+          .then(async () => {
+            const getItemMarkup = (json) => {
+              const journal = {
+                theme: "",
+                praise: "",
+                attention: "",
+                next_plan: ""
+              };
 
-          .then((doc) => {
+              if (json !== null) {
+                for (let key in journal) {
+                  journal[key] = json[key];
+                }
+              }
+
+              return journal;
+            };
+
+            //Получаем журнал
+            fetch(`https://tetrika-school.ru/api/lesson_info/${lessonId}`, { credentials: "include" })
+              .then(r => r.json())
+              .then(r => {
+                lessonInfo.journal = getItemMarkup(r.payload);
+              });
+
+            await getDocumentHtml(linkLogs)
+              .then(async doc => {
+                await logsAnalyzer(doc, lessonDate, lessonInfo);
+              });
+
+          })
+          .then(() => {
             return createUserInfo(linkTutor, "emailTutor");
           })
-          .then((doc) => {
-            resolve(lessonInfo);
+          .then(() => {
+            console.log(lessonInfo);
+            resolve(JSON.stringify(lessonInfo));
           })
           .catch((error) => {
             reject(error);
