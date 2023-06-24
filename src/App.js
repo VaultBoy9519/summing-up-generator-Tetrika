@@ -11,6 +11,7 @@ import { TutorCash } from "./components/TutorCash";
 import LogAnalyzer from "./components/LogAnalyzer";
 import Journal from "./components/Journal";
 
+
 function App() {
 
   const [messageToPupil, setMessageToPupil] = React.useState("");
@@ -28,6 +29,8 @@ function App() {
   const [logsPupil, setLogsPupil] = React.useState({});
   const [logsTutor, setLogsTutor] = React.useState({});
 
+
+  let halfTimeLesson;
   //Колбэки для получения пропсов из LessonInfo
   const onCreateLesson = (formValues, colorForms, lessonLink) => {
     setLesson(formValues);
@@ -77,7 +80,7 @@ function App() {
 
   //функция отвечает только за создание фрагмента со статусом урока
   const createStatusMessage = () => {
-    let cash;
+    let cash = 0;
     //Преобразование даты и времени в корректный формат
     const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "воскресение"];
     const adminkaDateLesson = lesson.dateLesson.split(" ").filter((n) => {
@@ -141,6 +144,8 @@ function App() {
     (() => {
       const keysPupil = Object.keys(statusInfoPupil);
       const keysTutor = Object.keys(statusInfoTutor());
+
+      console.log(cash);
 
       for (let numberStatus = 0; numberStatus <= keysPupil.length; numberStatus++) {
         if (numberStatus === (Number(lesson.statusLesson) - 1)) {
@@ -288,6 +293,7 @@ function App() {
       const data = await JSON.parse(event.data.data);
       if (typeof data === "object") {
         setLesson(data);
+        halfTimeLesson = data.durationLesson / 2;
         setEmailPupil(data.emailPupil);
         setEmailTutor(data.emailTutor);
         setLogsPupil(data.pupilLogs);
@@ -353,7 +359,7 @@ function App() {
                   </div>
                   <div className="col-lg-12">
                     <LogAnalyzer
-                      logsPupil={logsPupil}
+                      logs={logsPupil}
                       role={"У"}
                     />
                   </div>
@@ -365,7 +371,8 @@ function App() {
                   </div>
                   <div className="col-lg-12">
                     <LogAnalyzer
-                      logsPupil={logsTutor}
+                      halfTimeLesson={halfTimeLesson}
+                      logs={logsTutor}
                       role={"П"}
                     />
                   </div>
@@ -426,7 +433,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.2, 24.06.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.3, 25.06.2023).
           </div>
         </div>
       </div>

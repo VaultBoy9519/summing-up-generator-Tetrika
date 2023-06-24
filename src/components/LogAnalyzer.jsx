@@ -1,6 +1,13 @@
 import React from "react";
 
-const LogAnalyzer = ({ logsPupil, role }) => {
+const LogAnalyzer = ({ logs, role }) => {
+
+  const setStyle = (element, styles) => {
+    return element !== "" && element !== undefined ?
+      `bg-danger ${styles}` :
+      styles;
+  };
+
 
   return (
     <div>
@@ -8,36 +15,60 @@ const LogAnalyzer = ({ logsPupil, role }) => {
         <tbody>
         <tr>
           <td>Первое действие {role}</td>
-          <td className="right">{logsPupil.beginDate !== undefined ? logsPupil.beginDate : ""}</td>
+          <td className="right">{logs.beginDate !== undefined ? logs.beginDate : ""}</td>
         </tr>
         <tr>
           <td>Последнее действие {role}</td>
-          <td className="right">{logsPupil.endDate !== undefined ? logsPupil.endDate : ""}</td>
+          <td className="right">{logs.endDate !== undefined ? logs.endDate : ""}</td>
         </tr>
         <tr>
-          <td>{role} был на уроке</td>
+          <td>{role} был на уроке
+          </td>
           <td className="right">
             {
-              logsPupil.timeCountInLesson !== undefined && logsPupil.timeCountInLesson !== 0 ?
-                `${logsPupil.timeCountInLesson} мин.` :
-                logsPupil.timeCountInLesson === 0 ?
+              logs.timeCountInLesson !== undefined && logs.timeCountInLesson !== 0 ?
+                `${logs.timeCountInLesson} мин.` :
+                logs.timeCountInLesson === 0 ?
                   "Нет" :
                   ""
             }
           </td>
         </tr>
         <tr>
-          <td>Камера</td>
-          <td className="right">{logsPupil.camera !== "" ? logsPupil.camera : ""}</td>
+          <td className={
+            setStyle(logs.camera, "")
+          }>Камера
+          </td>
+          <td className={
+            setStyle(logs.camera, "right")
+          }>{logs.camera !== "" ? logs.camera : ""}</td>
         </tr>
         <tr>
-          <td>Микрофон</td>
-          <td className="right">{logsPupil.micro !== "" ? logsPupil.micro : ""}</td>
-        </tr>
-        <tr>
-          <td>Разрыв веб-сокетов</td>
           <td
-            className="right">{logsPupil.ws_closed !== undefined && logsPupil.ws_closed !== 0 ? `${logsPupil.ws_closed} раз` : ""}</td>
+            className={
+              setStyle(logs.micro, "")
+            }
+          >Микрофон
+          </td>
+          <td
+            className={
+              setStyle(logs.micro, "right")
+            }>{logs.micro !== "" ? logs.micro : ""}</td>
+        </tr>
+        <tr>
+          <td
+            className={
+              logs.ws_closed !== undefined && logs.ws_closed > 3 ?
+                "bg-danger" :
+                ""
+            }>Разрыв веб-сокетов
+          </td>
+          <td
+            className={
+              logs.ws_closed !== undefined && logs.ws_closed > 3 ?
+                "bg-danger right" :
+                "right"
+            }>{logs.ws_closed !== undefined && logs.ws_closed !== 0 ? `${logs.ws_closed} раз` : ""}</td>
         </tr>
         </tbody>
       </table>
