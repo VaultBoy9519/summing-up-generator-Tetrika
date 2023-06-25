@@ -100,9 +100,11 @@ function App() {
 
       const setCashTime = () => {
         switch (Number(lesson.durationLesson)) {
-          case 30 || 45:
+          case 30:
+          case 45:
             return 15;
-          case 60 || 120:
+          case 60:
+          case 120:
             return 25;
         }
       };
@@ -433,7 +435,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.3, 25.06.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.4, 26.06.2023).
           </div>
         </div>
       </div>
