@@ -21,6 +21,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         const linkEvents = `${dataLink}/events`;
         const lessonId = dataLink.includes(`tetrika-school.ru`) ? dataLink.replace("https://tetrika-school.ru/adminka/lessons/", "") : dataLink;
         let lessonDate;
+
+        const standartDateFormat = (date) => {
+          const timeZone = moment().utcOffset() / 60;
+
+          const formatDate = moment
+            .parseZone(date)
+            .utcOffset(timeZone)
+            .format("HH:mm:ss D MMM(Z)");
+          return formatDate;
+        };
+
         const getDocumentHtml = (link) => {
 
           const docCreator = (html) => {
@@ -168,9 +179,33 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 lessonInfo.journal = getItemMarkup(r.payload);
               });
 
+            const tutorEvents = [];
+            const pupilEvents = [];
+
+            await getDocumentHtml(
+              linkEvents
+            )
+              .then(async (doc) => {
+                await eventsParser(
+                  doc,
+                  tutorEvents,
+                  pupilEvents,
+                  standartDateFormat
+                );
+              })
+              .catch((error) => {
+                // Обработка ошибки, если что-то пошло не так
+                console.error(error); // Вывод ошибки в консоль
+              });
             await getDocumentHtml(linkLogs)
               .then(async doc => {
-                await logsAnalyzer(doc, lessonDate, lessonInfo);
+                await logsAnalyzer(
+                  doc,
+                  lessonDate,
+                  lessonInfo,
+                  pupilEvents,
+                  tutorEvents
+                );
               });
 
           })

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "SuG Extension v2",
   "description": "Расширение позволяет получать информацию об уроке",
-  "version": "1.6",
+  "version": "1.7",
   "icons": {
     "128": "logo.png"
   },
@@ -19,6 +19,7 @@
       "background.js",
       "filterNamePupil.js",
       "loki.js",
+      "eventsParser.js",
       "logsAnalyzer.js",
       "lib/moment.js",
       "node_modules/cyrillic-to-translit-js/dist/bundle.js"

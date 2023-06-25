@@ -1,4 +1,10 @@
-const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
+const logsAnalyzer = async (
+  doc,
+  lessonDate,
+  lessonInfo,
+  pupilEvents,
+  tutorEvents
+) => {
   const createWindowLesson = (doc) => {
     const scriptTags = doc.getElementsByTagName("script");
     for (let i = 0; i < scriptTags.length; i++) {
@@ -42,19 +48,17 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
       }
     });
 
-    const sortLogsByDateTime = (a, b) => {
-      const dateTimeA = new Date(a.dateTime);
-      const dateTimeB = new Date(b.dateTime);
-      return dateTimeA - dateTimeB;
-    };
-
-    const formatLessonDate = moment(lessonDate).format("HH:mm:ss D MMM(Z)");
     const beforeLessonDate = moment(lessonDate).subtract(15, "minutes").format("HH:mm:ss D MMM(Z)");
     const endLessonDate = moment(lessonDate).add(Number(lessonInfo.durationLesson), "minutes").format("HH:mm:ss D MMM(Z)");
 
     const filterLogsInLesson = (fullLogs) => {
+      const sortLogsByDateTime = (a, b) => {
+        const dateTimeA = new Date(a.dateTime);
+        const dateTimeB = new Date(b.dateTime);
+        return dateTimeA - dateTimeB;
+      };
       //console.log(`fullLogs: `, fullLogs);
-      if (fullLogs.length > 1) {
+      if (fullLogs.length > 0) {
         fullLogs.sort((a, b) => sortLogsByDateTime(a, b));
         return fullLogs.filter(log => {
           return log.dateTime >= beforeLessonDate && log.dateTime <= endLessonDate;
@@ -67,10 +71,10 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
     const pupilLogsLesson = filterLogsInLesson(pupilFullLogs);
     const tutorLogsLesson = filterLogsInLesson(tutorFullLogs);
 
-    // console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson);
-    // console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson);
+    console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson[0], pupilLogsLesson[pupilLogsLesson.length - 1]);
+    console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson[0], tutorLogsLesson[tutorLogsLesson.length - 1]);
 
-    const checkLogs = (logs) => {
+    const checkLogs = (logs, events) => {
 
       const dateTransform = (dateTime) => {
         return moment(dateTime, "HH:mm:ss DD MMM Z").format("HH:mm:ss");
@@ -82,12 +86,44 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
         timeCountInLesson: 0,
         camera: "",
         micro: "",
-        ws_closed: 0
+        ws_closed: 0,
+        clickButtonTp: 0
       };
 
-      if (logs.length > 1) {
-        const beginDate = logs[0].dateTime;
-        const endDate = logs[logs.length - 1].dateTime;
+      const formatLessonDate = moment(lessonDate).format("HH:mm:ss D MMM(Z)");
+      const filterEvents = events.length > 0 ? filterLogsInLesson(events) : [];
+
+      const setTimeCount = (beginDate, endDate) => {
+        const calcTimeCount = () => {
+          const timeCount = moment(endDate, "HH:mm:ss D MMM(Z)").diff(moment(beginDate, "HH:mm:ss D MMM(Z)"), "minutes");
+          info.timeCountInLesson = timeCount;
+        };
+
+        if (beginDate >= formatLessonDate && endDate > formatLessonDate) {
+          calcTimeCount(beginDate, endDate);
+        } else if (beginDate < formatLessonDate && endDate > formatLessonDate) {
+          calcTimeCount(formatLessonDate, endDate);
+        }
+      };
+
+      if (logs.length > 0) {
+        let beginDate;
+        let endDate;
+        console.log(filterEvents[0].role, filterEvents);
+        if (events.length > 0) {
+          console.log(filterEvents[0].role, filterEvents);
+          beginDate = filterEvents[0].dateTime < logs[0].dateTime ?
+            filterEvents[0].dateTime < formatLessonDate ?
+              formatLessonDate :
+              filterEvents[0].dateTime :
+            logs[0].dateTime;
+          endDate = filterEvents[filterEvents.length - 1].dateTime > logs[logs.length - 1].dateTime ?
+            filterEvents[filterEvents.length - 1].dateTime :
+            logs[logs.length - 1].dateTime;
+        } else {
+          beginDate = logs[0].dateTime > formatLessonDate ? logs[0].dateTime : formatLessonDate;
+          endDate = logs[logs.length - 1].dateTime;
+        }
 
         if (beginDate < formatLessonDate && endDate > formatLessonDate) {
           info.beginDate = dateTransform(formatLessonDate);
@@ -97,16 +133,13 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
 
         info.endDate = dateTransform(endDate);
 
-        const setTimeCount = (beginDate) => {
-          const timeCount = moment(endDate, "HH:mm:ss D MMM(Z)").diff(moment(beginDate, "HH:mm:ss D MMM(Z)"), "minutes");
-          info.timeCountInLesson = timeCount;
-        };
+        setTimeCount(beginDate, endDate);
 
-        if (beginDate > formatLessonDate && endDate > formatLessonDate) {
-          setTimeCount(beginDate);
-        } else if (beginDate < formatLessonDate && endDate > formatLessonDate) {
-          setTimeCount(formatLessonDate);
-        }
+        filterEvents.forEach(event => {
+          if (event.description === "На уроке возникли технические сложности!") {
+            info.clickButtonTp++;
+          }
+        });
 
         logs.forEach(log => {
           switch (log.msgKey) {
@@ -127,6 +160,14 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
               break;
           }
         });
+      } else if (filterEvents.length > 0) {
+        const beginDate = filterEvents[0].dateTime > formatLessonDate ? filterEvents[0].dateTime : formatLessonDate;
+        const endDate = filterEvents[filterEvents.length - 1].dateTime;
+        info.beginDate = dateTransform(beginDate);
+        info.endDate = dateTransform(endDate);
+
+        setTimeCount(beginDate, endDate);
+
       }
 
       return info;
@@ -136,8 +177,8 @@ const logsAnalyzer = async (doc, lessonDate, lessonInfo) => {
     // //console.log(`Действия У на уроке: `, checkLogs(pupilFullLogs));
     // //console.log(`Действия П на уроке: `, checkLogs(tutorFullLogs));
 
-    lessonInfo.pupilLogs = checkLogs(pupilLogsLesson);
-    lessonInfo.tutorLogs = checkLogs(tutorLogsLesson);
+    lessonInfo.pupilLogs = checkLogs(pupilLogsLesson, pupilEvents);
+    lessonInfo.tutorLogs = checkLogs(tutorLogsLesson, tutorEvents);
 
     return;
 

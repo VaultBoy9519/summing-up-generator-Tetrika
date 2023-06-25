@@ -361,6 +361,7 @@ function App() {
                   </div>
                   <div className="col-lg-12">
                     <LogAnalyzer
+                      durationLesson={lesson.durationLesson}
                       logs={logsPupil}
                       role={"У"}
                     />
@@ -373,7 +374,7 @@ function App() {
                   </div>
                   <div className="col-lg-12">
                     <LogAnalyzer
-                      halfTimeLesson={halfTimeLesson}
+                      durationLesson={lesson.durationLesson}
                       logs={logsTutor}
                       role={"П"}
                     />
@@ -435,7 +436,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.4, 26.06.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.5, 26.06.2023).
           </div>
         </div>
       </div>
