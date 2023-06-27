@@ -10,6 +10,7 @@ import AppContext from "./components/AppContext";
 import { TutorCash } from "./components/TutorCash";
 import LogAnalyzer from "./components/LogAnalyzer";
 import Journal from "./components/Journal";
+import { useMediaQuery } from "@mui/material";
 
 
 function App() {
@@ -29,6 +30,8 @@ function App() {
   const [logsPupil, setLogsPupil] = React.useState({});
   const [logsTutor, setLogsTutor] = React.useState({});
 
+  const isLargeScreen = useMediaQuery("(min-width: 992px)");
+  const isSmallScreen = useMediaQuery("(max-width: 991px)");
 
   let halfTimeLesson;
   //Колбэки для получения пропсов из LessonInfo
@@ -359,20 +362,20 @@ function App() {
                   <div className="lessonInfo">
                     Логи урока
                   </div>
-                  <div className="col-lg-12">
+                  <div className="col-lg-12 col-md-6">
                     <LogAnalyzer
                       durationLesson={lesson.durationLesson}
                       logs={logsPupil}
                       role={"У"}
                     />
                   </div>
-                  <div className="col-lg-12">
+                  {isLargeScreen && <div className="col-lg-12">
                     <Journal
                       durationLesson={lesson.durationLesson}
                       journal={lesson.journal}
                     />
-                  </div>
-                  <div className="col-lg-12">
+                  </div>}
+                  <div className="col-lg-12 col-md-6 col-sm-6">
                     <LogAnalyzer
                       durationLesson={lesson.durationLesson}
                       logs={logsTutor}
@@ -380,6 +383,12 @@ function App() {
                     />
                   </div>
                 </div>
+                {isSmallScreen && <div>
+                  <Journal
+                    durationLesson={lesson.durationLesson}
+                    journal={lesson.journal}
+                  />
+                </div>}
               </div>
               <div className="col-lg-5 resumeFields">
                 <div className="row">
@@ -436,7 +445,9 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.5, 26.06.2023).
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.6, 27.06.2023). &nbsp;<a
+            href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
+            target="_blank">SuG Extension v1.7</a>
           </div>
         </div>
       </div>
