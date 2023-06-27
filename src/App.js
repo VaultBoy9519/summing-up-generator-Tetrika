@@ -32,6 +32,7 @@ function App() {
 
   const isLargeScreen = useMediaQuery("(min-width: 992px)");
   const isSmallScreen = useMediaQuery("(max-width: 991px)");
+  const isMobileScreen = useMediaQuery("(max-width: 500px)");
 
   let halfTimeLesson;
   //Колбэки для получения пропсов из LessonInfo
@@ -362,7 +363,7 @@ function App() {
                   <div className="lessonInfo">
                     Логи урока
                   </div>
-                  <div className="col-lg-12 col-md-6">
+                  <div className="col-lg-12 col-md-6 col-sm-6">
                     <LogAnalyzer
                       durationLesson={lesson.durationLesson}
                       logs={logsPupil}
@@ -445,9 +446,10 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.6, 27.06.2023). &nbsp;<a
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.6,
+            27.06.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.7</a>
+            target="_blank">SuG Extension v1.7</a>}
           </div>
         </div>
       </div>
