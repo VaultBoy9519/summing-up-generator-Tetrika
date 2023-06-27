@@ -1,13 +1,13 @@
 {
   "files": {
-    "main.css": "/summing-up-generator-Tetrika/static/css/main.0cfb5f59.css",
-    "main.js": "/summing-up-generator-Tetrika/static/js/main.af1a4add.js",
+    "main.css": "/summing-up-generator-Tetrika/static/css/main.891f8529.css",
+    "main.js": "/summing-up-generator-Tetrika/static/js/main.932994c7.js",
     "index.html": "/summing-up-generator-Tetrika/index.html",
-    "main.0cfb5f59.css.map": "/summing-up-generator-Tetrika/static/css/main.0cfb5f59.css.map",
-    "main.af1a4add.js.map": "/summing-up-generator-Tetrika/static/js/main.af1a4add.js.map"
+    "main.891f8529.css.map": "/summing-up-generator-Tetrika/static/css/main.891f8529.css.map",
+    "main.932994c7.js.map": "/summing-up-generator-Tetrika/static/js/main.932994c7.js.map"
   },
   "entrypoints": [
-    "static/css/main.0cfb5f59.css",
-    "static/js/main.af1a4add.js"
+    "static/css/main.891f8529.css",
+    "static/js/main.932994c7.js"
   ]
 }
