@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "SuG Extension v2",
-  "description": "Расширение позволяет получать информацию об уроке",
+  "name": "LA Extension v2",
+  "description": "Полное взаимодействие с админкой урока",
   "version": "1.8",
   "icons": {
     "128": "logo.png"

@@ -460,7 +460,7 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.7,
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.8,
             01.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
             target="_blank">SuG Extension v1.8</a>}
