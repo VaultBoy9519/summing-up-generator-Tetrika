@@ -115,6 +115,10 @@ textarea:disabled {
     background-color: white;
 }
 
+.textColor {
+    color: white;
+}
+
 .button-div {
     display: flex;
     justify-content: center;
@@ -176,7 +180,7 @@ textarea:disabled {
 
 @media (max-width: 767px) {
     .table-sm {
-        font-size: 15px;
+        font-size: 14px;
     }
 }
 

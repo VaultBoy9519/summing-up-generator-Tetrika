@@ -157,9 +157,19 @@ function App() {
         if (numberStatus === (Number(lesson.statusLesson) - 1)) {
           const statusPupilValue = statusInfoPupil[keysPupil[numberStatus]];
           console.log(`tutorCash: `, tutorCash);
+
+          const checkMVU = () => {
+            if (emailTutor.includes("tetrika.school")) {
+              return "";
+            } else {
+              return ". За урок вам начислена компенсация";
+            }
+          };
+
+          const tutorOrMvu = checkMVU();
+
           const compensMessage = cash === lesson.tutorCash || cash === lesson.tutorCash - 125 ? ` в размере ставки урока` : ``;
-          console.log(`compensMessage: `, compensMessage);
-          const statusTutorValue = statusInfoTutor(compensMessage)[keysTutor[numberStatus]];
+          const statusTutorValue = statusInfoTutor(compensMessage, tutorOrMvu)[keysTutor[numberStatus]];
           return setStatusLessonMessage(statusPupilValue, statusTutorValue);
         }
       }
@@ -374,13 +384,14 @@ function App() {
                     <Journal
                       durationLesson={lesson.durationLesson}
                       journal={lesson.journal}
+                      lessonType={lesson.type}
                     />
                   </div>}
                   <div className="col-lg-12 col-md-6 col-sm-6">
                     <LogAnalyzer
                       durationLesson={lesson.durationLesson}
                       logs={logsTutor}
-                      role={"П"}
+                      role={emailTutor.includes("tetrika.school") ? "МВУ" : "П"}
                     />
                   </div>
                 </div>
@@ -388,6 +399,7 @@ function App() {
                   <Journal
                     durationLesson={lesson.durationLesson}
                     journal={lesson.journal}
+                    lessonType={lesson.type}
                   />
                 </div>}
               </div>
@@ -398,11 +410,12 @@ function App() {
                   </div>
                   <div className="col-lg-12 resumePupil">
                     <ResumeField
-                      userRole={"ученика"}
+                      userRole={"У"}
                       message={messageToPupil}
                       renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
                       renew={renew}
                       emailUser={emailPupil}
+                      chatLink={lesson.pupilChat}
                     />
                   </div>
                   <div className="tutorCashComponent">
@@ -413,11 +426,12 @@ function App() {
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
-                      userRole={"преподавателя"}
+                      userRole={emailTutor.includes("tetrika.school") ? "МВУ" : "П"}
                       message={messageToTutor}
                       renewMessage={(message, messageText) => renewMessageTutor(message, messageText)}
                       renew={renew}
                       emailUser={emailTutor}
+                      chatLink={lesson.tutorChat}
                     />
                   </div>
                 </div>
@@ -446,10 +460,10 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.6,
-            27.06.2023). &nbsp;{!isMobileScreen && <a
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.7,
+            01.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.7</a>}
+            target="_blank">SuG Extension v1.8</a>}
           </div>
         </div>
       </div>

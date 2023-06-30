@@ -18,7 +18,6 @@ const logsAnalyzer = async (
 
         const lessonObject = JSON.parse(updatedStr);
 
-        //console.log("объект - ", lessonObject);
         return lessonObject;
       }
     }
@@ -51,6 +50,7 @@ const logsAnalyzer = async (
     const beforeLessonDate = moment(lessonDate).subtract(15, "minutes").format("HH:mm:ss D MMM(Z)");
     const endLessonDate = moment(lessonDate).add(Number(lessonInfo.durationLesson), "minutes").format("HH:mm:ss D MMM(Z)");
 
+
     const filterLogsInLesson = (fullLogs) => {
       const sortLogsByDateTime = (a, b) => {
         const dateTimeA = new Date(a.dateTime);
@@ -60,8 +60,14 @@ const logsAnalyzer = async (
       //console.log(`fullLogs: `, fullLogs);
       if (fullLogs.length > 0) {
         fullLogs.sort((a, b) => sortLogsByDateTime(a, b));
+
         return fullLogs.filter(log => {
-          return log.dateTime >= beforeLessonDate && log.dateTime <= endLessonDate;
+
+          const dateTime = moment(log.dateTime, "HH:mm:ss D MMM(Z)").toISOString();
+          const beforeTime = moment(beforeLessonDate, "HH:mm:ss D MMM(Z)").toISOString();
+          const endTime = moment(endLessonDate, "HH:mm:ss D MMM(Z)").toISOString();
+
+          return dateTime >= beforeTime && dateTime <= endTime;
         });
       } else {
         return fullLogs;
@@ -71,8 +77,8 @@ const logsAnalyzer = async (
     const pupilLogsLesson = filterLogsInLesson(pupilFullLogs);
     const tutorLogsLesson = filterLogsInLesson(tutorFullLogs);
 
-    console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson[0], pupilLogsLesson[pupilLogsLesson.length - 1]);
-    console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson[0], tutorLogsLesson[tutorLogsLesson.length - 1]);
+    // console.log("Логи У с учетом 15 мин до урока: ", pupilLogsLesson[0], pupilLogsLesson[pupilLogsLesson.length - 1]);
+    // console.log("Логи П с учетом 15 мин до урока: ", tutorLogsLesson[0], tutorLogsLesson[tutorLogsLesson.length - 1]);
 
     const checkLogs = (logs, events) => {
 
@@ -94,7 +100,8 @@ const logsAnalyzer = async (
       const filterEvents = events.length > 0 ? filterLogsInLesson(events) : [];
 
       const setTimeCount = (beginDate, endDate) => {
-        const calcTimeCount = () => {
+        const calcTimeCount = (beginDate, endDate) => {
+
           const timeCount = moment(endDate, "HH:mm:ss D MMM(Z)").diff(moment(beginDate, "HH:mm:ss D MMM(Z)"), "minutes");
           info.timeCountInLesson = timeCount;
         };
@@ -109,9 +116,7 @@ const logsAnalyzer = async (
       if (logs.length > 0) {
         let beginDate;
         let endDate;
-        console.log(filterEvents[0].role, filterEvents);
         if (events.length > 0) {
-          console.log(filterEvents[0].role, filterEvents);
           beginDate = filterEvents[0].dateTime < logs[0].dateTime ?
             filterEvents[0].dateTime < formatLessonDate ?
               formatLessonDate :
@@ -168,6 +173,8 @@ const logsAnalyzer = async (
 
         setTimeCount(beginDate, endDate);
 
+      } else {
+        console.log(`Логи отсутствуют`);
       }
 
       return info;
@@ -186,10 +193,10 @@ const logsAnalyzer = async (
 
   await processLogs()
     .then(() => {
-      //console.log(`Получилось`);
+      // console.log(`Получилось`);
     })
     .catch((error) => {
-      //console.log(`Не вышло`, error);
+      console.log(error);
     });
 
 };

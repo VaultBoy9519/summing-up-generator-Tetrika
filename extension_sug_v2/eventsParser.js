@@ -44,11 +44,11 @@ const eventsParser = (
       }
     });
 
-    console.log("Tutor Events: ", tutorEvents);
-    console.log("Pupil Events: ", pupilEvents);
+    // console.log("Tutor Events: ", tutorEvents);
+    // console.log("Pupil Events: ", pupilEvents);
 
   } else {
-    console.log("Элемент не найден");
+    console.log("События отсутствуют");
   }
   return;
 };

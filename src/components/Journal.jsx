@@ -1,4 +1,4 @@
-const Journal = ({ durationLesson, journal }) => {
+const Journal = ({ durationLesson, journal, lessonType }) => {
 
   const checkJournal = () => {
 
@@ -47,8 +47,10 @@ const Journal = ({ durationLesson, journal }) => {
             style={{ color: "white", cursor: "default" }}>
         Журнал: {checkJournal()}
       </span>
-      <span className="btn bg-secondary" style={{ color: "white", cursor: "default" }}>
-        {durationLesson ? `${durationLesson} мин.` : `Длина урока`}
+      <span
+        className={lessonType === "РУ" ? "btn bg-info" : lessonType === "ВУ" ? "btn bg-warning" : "btn bg-secondary textColor"}
+        style={{ cursor: "default" }}>
+        {durationLesson ? `${lessonType}, ${durationLesson} мин.` : `Длина урока`}
       </span>
     </div>
   );

@@ -33,6 +33,8 @@ class Loki {
           .utcOffset(timeZone)
           .format("HH:mm:ss D MMM(Z)");
 
+        // console.log(moment(result.dateTime).format("YYYY-MM-DDTHH:mm:ssZ"));
+
         return result;
       });
 

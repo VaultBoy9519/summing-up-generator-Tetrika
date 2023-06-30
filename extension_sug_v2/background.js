@@ -82,6 +82,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 lessonInfo.idPupil = jsonObj.additional_id;
               }
             });
+          const chatLink = `https://tetrika-school.ru${doc.querySelector("a[href^='/chat/']").getAttribute("href")}`;
+          if (emailUser.includes("Pupil")) {
+            lessonInfo.pupilChat = chatLink;
+          } else {
+            lessonInfo.tutorChat = chatLink;
+          }
         };
 
         getDocumentHtml(dataLink)
@@ -113,6 +119,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               };
 
               const generalLessonInfo = createGeneralInfo();
+
+              lessonInfo.type = generalLessonInfo["вводный урок"] === "Нет" ? "РУ" : "ВУ";
 
               //Функция выбирает статус урока в объект
               const setStatusLesson = () => {

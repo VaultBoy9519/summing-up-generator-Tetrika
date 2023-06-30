@@ -52,7 +52,7 @@ const LogAnalyzer = ({ durationLesson, logs, role }) => {
               "bg-danger" : logs.clickButtonTp === 1 ?
                 "bg-warning" :
                 ""
-          }>{role} нажимал кнопку ТП
+          }>{role} нажал кнопку ТП
           </td>
           <td
             className={
