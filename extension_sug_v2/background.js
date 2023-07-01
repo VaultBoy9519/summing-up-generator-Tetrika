@@ -290,7 +290,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           }
         });
     } else {
-      sendResponse(`Компенс не требуется`);
+      sendResponse(``);
     }
 
     return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно

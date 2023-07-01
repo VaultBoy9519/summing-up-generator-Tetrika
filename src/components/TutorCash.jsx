@@ -26,8 +26,8 @@ export const TutorCash = ({ tutorCash, compensStatus, postCompensTutor }) => {
       <span className={compensMessage(classesCash)}
       >{tutorCash > 0 ? `${tutorCash} ₽` : `₽`}</span>
       <input className="form-control" name="messageCompensText" readOnly
-             style={tutorCash > 0 && (compensStatus !== "" || compensStatus !== "Уже выполнен") ? { backgroundColor: "orange" } : { backgroundColor: "white" }}
-             defaultValue={tutorCash > 0 && (compensStatus !== "" || compensStatus !== "Уже выполнен") ? `Требуется начислить компенсацию` : compensMessage(compensMessages)}
+             style={tutorCash > 0 && compensStatus === "" ? { backgroundColor: "orange" } : { backgroundColor: "white" }}
+             defaultValue={tutorCash > 0 && compensStatus === "" ? `Требуется начислить компенсацию` : compensMessage(compensMessages)}
              placeholder="Компенсация П не требуется" />
 
 
