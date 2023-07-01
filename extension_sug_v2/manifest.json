@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "LA Extension v2",
   "description": "Полное взаимодействие с админкой урока",
-  "version": "1.8",
+  "version": "1.9",
   "icons": {
     "128": "logo.png"
   },
@@ -21,6 +21,7 @@
       "loki.js",
       "eventsParser.js",
       "logsAnalyzer.js",
+      "postCompensTutor.js",
       "lib/moment.js",
       "node_modules/cyrillic-to-translit-js/dist/bundle.js"
     ],

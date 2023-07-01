@@ -5,7 +5,7 @@ window.addEventListener("message", (event) => {
     return;
   }
 
-  if (event.data.type !== "FROM_PAGE") {
+  if (event.data.type !== "FROM_PAGE" && event.data.type !== "FROM_PAGE_COMPENS") {
     return;
   }
 
@@ -15,11 +15,17 @@ window.addEventListener("message", (event) => {
 
   isWaitingForResponse = true; // Устанавливаем флаг, что мы отправили запрос
 
-  chrome.runtime.sendMessage({ type: "FROM_CONTENT", data: event.data.data }, (response) => {
-    isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
-    console.log(response);
-    window.postMessage({ type: "FROM_CONTENT", data: response }, "*");
-  });
+  if (event.data.type === "FROM_PAGE") {
+    chrome.runtime.sendMessage({ type: "FROM_CONTENT", data: event.data.data }, (response) => {
+      isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
+      window.postMessage({ type: "FROM_CONTENT", data: response }, "*");
+    });
+  } else {
+    chrome.runtime.sendMessage({ type: "FROM_CONTENT_COMPENS", data: event.data.data }, (response) => {
+      isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
+      window.postMessage({ type: "FROM_CONTENT_COMPENS", data: response }, "*");
+    });
+  }
 });
 
 window.postMessage({ type: "CONTENT_SCRIPT_LOADED" }, "*");

@@ -29,12 +29,12 @@ function App() {
   const [messageCompens, setMessageCompens] = React.useState("");
   const [logsPupil, setLogsPupil] = React.useState({});
   const [logsTutor, setLogsTutor] = React.useState({});
+  const [compensStatus, setCompensStatus] = React.useState("");
 
   const isLargeScreen = useMediaQuery("(min-width: 992px)");
   const isSmallScreen = useMediaQuery("(max-width: 991px)");
   const isMobileScreen = useMediaQuery("(max-width: 500px)");
 
-  let halfTimeLesson;
   //Колбэки для получения пропсов из LessonInfo
   const onCreateLesson = (formValues, colorForms, lessonLink) => {
     setLesson(formValues);
@@ -271,6 +271,7 @@ function App() {
     setMessageCompens("");
     setMessageToPupil("");
     setMessageToTutor("");
+    setCompensStatus("");
     setEmailPupil("E-mail");
     setEmailTutor("E-mail");
     setLogsPupil({});
@@ -309,7 +310,6 @@ function App() {
       const data = await JSON.parse(event.data.data);
       if (typeof data === "object") {
         setLesson(data);
-        halfTimeLesson = data.durationLesson / 2;
         setEmailPupil(data.emailPupil);
         setEmailTutor(data.emailTutor);
         setLogsPupil(data.pupilLogs);
@@ -329,23 +329,43 @@ function App() {
     };
   }, [link]);
 
-// Запрос загрузки контентного скрипта
-  window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
-
-
-  //автозаполнение объекта с инфой об уроке
-  const createNames = () => {
+  const postCompensTutor = () => {
     const obj = {
-      dateLesson: `18:00 четверг, 01 февраля`,
-      nameTutor: `Тест Тестович Тетрилин`,
-      idPupil: `Ливерная Голубка 14`,
-      namePupil: `Тест Ева`,
-      statusLesson: "1"
+      cash: tutorCash,
+      comment: messageCompens,
+      lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
+      adminName: lesson.adminName,
+      fullIdTutor: lesson.fullIdTutor
     };
-    setLesson(obj);
-    console.log(lesson);
+    window.postMessage(
+      {
+        type: "FROM_PAGE_COMPENS",
+        data: obj
+      },
+      "*"
+    );
+    console.log(`Компенсация отправлена`);
   };
 
+  React.useEffect(() => {
+    let receivedResponse = false;
+
+    window.addEventListener("message", async (event) => {
+      if (event.source !== window) {
+        return;
+      }
+      if (event.data.type !== "FROM_CONTENT_COMPENS") {
+        return;
+      }
+      receivedResponse = true;
+      const response = event.data.data;
+      console.log(response);
+      setCompensStatus(response);
+    });
+  });
+
+// Передача сообщения любым слушателям в окнах
+  window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
 
   return (
     <AppContext.Provider value={{ color, optRecs, lesson, link, colorLink }}>
@@ -421,8 +441,8 @@ function App() {
                   <div className="tutorCashComponent">
                     <TutorCash
                       tutorCash={tutorCash}
-                      messageCompens={messageCompens}
-                      link={link} />
+                      compensStatus={compensStatus}
+                      postCompensTutor={postCompensTutor} />
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
@@ -446,24 +466,25 @@ function App() {
                   onClick={generateSummary}>Создать
           </button>
           <button type="button"
+                  style={{ display: "none" }}
+                  name="testButton"
+                  className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
+                  onClick={postCompensTutor}>Компенсировать
+          </button>
+          <button type="button"
                   name="clearButton"
                   className="btn btn-secondary bg-gradient btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={setCheckReset}>Очистить
           </button>
-          <button type="button"
-                  name="testButton"
-                  style={{ display: "none" }}
-                  className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={createNames}>Тест
-          </button>
+
         </div>
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.8,
-            01.07.2023). &nbsp;{!isMobileScreen && <a
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9,
+            02.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.8</a>}
+            target="_blank">SuG Extension v1.9</a>}
           </div>
         </div>
       </div>
@@ -472,4 +493,7 @@ function App() {
 }
 
 export default App;
+
+
+
 
