@@ -1,6 +1,6 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
-  if (request.type !== "FROM_CONTENT" && request.type !== "FROM_CONTENT_COMPENS") {
+  if (request.type !== "FROM_CONTENT" && request.type !== "FROM_CONTENT_COMPENS" && request.type !== "FROM_CONTENT_POST-MESSAGE") {
     return;
   }
 
@@ -108,7 +108,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     for (let i = 0; i < rows.length; i++) {
                       const cells = rows[i].querySelectorAll("td");
                       const key = cells[0].textContent.trim();
-                      if (key === "состояние" || key === "вводный урок" || key === "ставка урока" || key === "длительность" || key === "назначенное время") {
+                      if (
+                        key === "состояние" ||
+                        key === "вводный урок" ||
+                        key === "ставка урока" ||
+                        key === "длительность" ||
+                        key === "назначенное время" ||
+                        key === "тип кварков") {
                         let value = cells[1].querySelector("dd").textContent.trim();
                         if (Number(value)) {
                           value = Number(value).toFixed();
@@ -126,6 +132,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 const generalLessonInfo = createGeneralInfo();
 
                 lessonInfo.type = generalLessonInfo["вводный урок"] === "Нет" ? "РУ" : "ВУ";
+                lessonInfo.quarks = Number(generalLessonInfo["тип кварков"].replace(/\[|\]/g, ""));
 
                 //Функция выбирает статус урока в объект
                 const setStatusLesson = () => {
@@ -168,6 +175,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return createUserInfo(linkPupil, "emailPupil");
               })
             .then(async () => {
+              //Получить журнал урока
               const getItemMarkup = (json) => {
                 const journal = {
                   theme: "",
@@ -185,7 +193,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 return journal;
               };
 
-              //Получаем журнал
               fetch(`https://tetrika-school.ru/api/lesson_info/${lessonId}`, { credentials: "include" })
                 .then(r => r.json())
                 .then(r => {
@@ -195,6 +202,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
               const tutorEvents = [];
               const pupilEvents = [];
 
+              //Получить и провести анализ событий
               await getDocumentHtml(
                 linkEvents
               )
@@ -210,6 +218,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                   // Обработка ошибки, если что-то пошло не так
                   console.error(error); // Вывод ошибки в консоль
                 });
+
+              //Получить и провести анализ логов
               await getDocumentHtml(linkLogs)
                 .then(async doc => {
                   await logsAnalyzer(
@@ -220,6 +230,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     tutorEvents
                   );
                 });
+
+              //Получить имя админа
               await getDocumentHtml("https://tetrika-school.ru/adminka")
                 .then(async doc => {
                   const header = doc.querySelector("h2").textContent;
@@ -249,7 +261,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     createLessonInfo.then(sendResponse, (error) => {
       console.log(error);
     });
-    return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно
+
   } else if (request.type === "FROM_CONTENT_COMPENS") {
     const data = request.data;
 
@@ -292,12 +304,26 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     } else {
       sendResponse(``);
     }
+  } else if (request.type === "FROM_CONTENT_POST-MESSAGE") {
+    const body = JSON.stringify(request.data);
+    console.log(body);
 
-    return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно
+
+    const payloadOptions = {
+      referrer: "https://tetrika-school.ru/",
+      referrerPolicy: "strict-origin-when-cross-origin",
+      body: body,
+      method: "POST",
+      mode: "cors",
+      credentials: "include"
+    };
+
+    console.log(payloadOptions);
+
+    postMessage(payloadOptions)
+      .then(sendResponse, (error) => {
+        console.log(error);
+      });
   }
-
+  return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно
 });
-
-
-
-

@@ -329,22 +329,56 @@ function App() {
     };
   }, [link]);
 
-  const postCompensTutor = () => {
-    const obj = {
-      cash: tutorCash,
-      comment: messageCompens,
-      lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
-      adminName: lesson.adminName,
-      fullIdTutor: lesson.fullIdTutor
+  const compensPayload = {
+    cash: tutorCash,
+    comment: messageCompens,
+    lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
+    adminName: lesson.adminName,
+    fullIdTutor: lesson.fullIdTutor
+  };
+
+  function PayloadMessage(chatLink, message, fullId) {
+    this.channel_id = chatLink && chatLink.replace("https://tetrika-school.ru/chat/", "");
+    this.message = message;
+    this.file_ids = [];
+    this.props = {
+      userId: fullId,
+      userName: lesson.adminName,
+      isTechIssue: false
     };
+  }
+
+  const payloadMessagePupil = new PayloadMessage(lesson.pupilChat, messageToPupil, lesson.fullIdPupil);
+  const payloadMessageTutor = new PayloadMessage(lesson.tutorChat, messageToTutor, lesson.fullIdTutor);
+
+
+  // const payloadMessageTutor = {
+  //   channel_id: lesson.tutorChat && lesson.tutorChat.replace("https://tetrika-school.ru/chat/", ""),
+  //   message: messageToTutor,
+  //   file_ids: [],
+  //   props: {
+  //     userId: lesson.fullIdTutor,
+  //     userName: lesson.adminName,
+  //     isTechIssue: false
+  //   }
+  // };
+
+  const postMessage = (payload, type) => {
+
     window.postMessage(
       {
-        type: "FROM_PAGE_COMPENS",
-        data: obj
+        type: type,
+        data: payload
       },
       "*"
     );
-    console.log(`Компенсация отправлена`);
+  };
+
+  const multipost = () => {
+    postMessage(payloadMessagePupil, "FROM_PAGE_POST-MESSAGE");
+    setTimeout(() => {
+      postMessage(payloadMessageTutor, "FROM_PAGE_POST-MESSAGE");
+    }, 2000);
   };
 
   React.useEffect(() => {
@@ -354,15 +388,25 @@ function App() {
       if (event.source !== window) {
         return;
       }
-      if (event.data.type !== "FROM_CONTENT_COMPENS") {
-        return;
+
+      switch (event.data.type) {
+        case "FROM_CONTENT_COMPENS":
+          receivedResponse = true;
+          const response = event.data.data;
+          console.log(response);
+          setCompensStatus(response);
+          break;
+        case "FROM_CONTENT_POST-MESSAGE":
+          console.log(event.data.data);
+          break;
+        default:
+          return;
       }
-      receivedResponse = true;
-      const response = event.data.data;
-      console.log(response);
-      setCompensStatus(response);
+
+
     });
   });
+
 
 // Передача сообщения любым слушателям в окнах
   window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
@@ -442,7 +486,7 @@ function App() {
                     <TutorCash
                       tutorCash={tutorCash}
                       compensStatus={compensStatus}
-                      postCompensTutor={postCompensTutor} />
+                      postCompensTutor={() => postMessage(compensPayload, "FROM_PAGE_COMPENS")} />
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
@@ -466,10 +510,11 @@ function App() {
                   onClick={generateSummary}>Создать
           </button>
           <button type="button"
-                  style={{ display: "none" }}
+                  style={{ display: "inline-block" }}
                   name="testButton"
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={postCompensTutor}>Компенсировать
+                  onClick={() => multipost()}
+          >Тест
           </button>
           <button type="button"
                   name="clearButton"
@@ -481,10 +526,10 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9,
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.1,
             02.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.9</a>}
+            target="_blank">SuG Extension v1.9.1</a>}
           </div>
         </div>
       </div>

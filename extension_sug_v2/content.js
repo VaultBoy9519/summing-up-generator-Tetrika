@@ -1,11 +1,15 @@
 let isWaitingForResponse = false; // Флаг, указывающий, что мы ждем ответа
 
 window.addEventListener("message", (event) => {
-  if (event.source !== window) {
-    return;
-  }
 
-  if (event.data.type !== "FROM_PAGE" && event.data.type !== "FROM_PAGE_COMPENS") {
+  const getAndPost = (type) => {
+    chrome.runtime.sendMessage({ type: type, data: event.data.data }, (response) => {
+      isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
+      window.postMessage({ type: type, data: response }, "*");
+    });
+  };
+
+  if (event.source !== window) {
     return;
   }
 
@@ -15,16 +19,19 @@ window.addEventListener("message", (event) => {
 
   isWaitingForResponse = true; // Устанавливаем флаг, что мы отправили запрос
 
-  if (event.data.type === "FROM_PAGE") {
-    chrome.runtime.sendMessage({ type: "FROM_CONTENT", data: event.data.data }, (response) => {
-      isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
-      window.postMessage({ type: "FROM_CONTENT", data: response }, "*");
-    });
-  } else {
-    chrome.runtime.sendMessage({ type: "FROM_CONTENT_COMPENS", data: event.data.data }, (response) => {
-      isWaitingForResponse = false; // Сбрасываем флаг после получения ответа
-      window.postMessage({ type: "FROM_CONTENT_COMPENS", data: response }, "*");
-    });
+  switch (event.data.type) {
+    case "FROM_PAGE":
+      getAndPost("FROM_CONTENT");
+      break;
+    case "FROM_PAGE_COMPENS":
+      getAndPost("FROM_CONTENT_COMPENS");
+      break;
+    case "FROM_PAGE_POST-MESSAGE":
+      getAndPost("FROM_CONTENT_POST-MESSAGE");
+      break;
+    default:
+      isWaitingForResponse = false;
+      return;
   }
 });
 
