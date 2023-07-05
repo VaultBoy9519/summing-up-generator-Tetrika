@@ -167,8 +167,8 @@ function App() {
           };
 
           const tutorOrMvu = checkMVU();
-
-          const compensMessage = cash === lesson.tutorCash || cash === lesson.tutorCash - 125 ? ` в размере ставки урока` : ``;
+          console.log(cash);
+          const compensMessage = (cash === lesson.tutorCash || cash === lesson.tutorCash - 125) && cash !== 0 ? ` в размере ставки урока` : ``;
           const statusTutorValue = statusInfoTutor(compensMessage, tutorOrMvu)[keysTutor[numberStatus]];
           return setStatusLessonMessage(statusPupilValue, statusTutorValue);
         }
@@ -337,8 +337,8 @@ function App() {
     fullIdTutor: lesson.fullIdTutor
   };
 
-  function PayloadMessage(chatLink, message, fullId) {
-    this.channel_id = chatLink && chatLink.replace("https://tetrika-school.ru/chat/", "");
+  function PayloadMessage(chatId, message, fullId) {
+    this.channel_id = chatId && chatId;
     this.message = message;
     this.file_ids = [];
     this.props = {
@@ -350,18 +350,6 @@ function App() {
 
   const payloadMessagePupil = new PayloadMessage(lesson.pupilChat, messageToPupil, lesson.fullIdPupil);
   const payloadMessageTutor = new PayloadMessage(lesson.tutorChat, messageToTutor, lesson.fullIdTutor);
-
-
-  // const payloadMessageTutor = {
-  //   channel_id: lesson.tutorChat && lesson.tutorChat.replace("https://tetrika-school.ru/chat/", ""),
-  //   message: messageToTutor,
-  //   file_ids: [],
-  //   props: {
-  //     userId: lesson.fullIdTutor,
-  //     userName: lesson.adminName,
-  //     isTechIssue: false
-  //   }
-  // };
 
   const postMessage = (payload, type) => {
 
@@ -375,10 +363,43 @@ function App() {
   };
 
   const multipost = () => {
-    postMessage(payloadMessagePupil, "FROM_PAGE_POST-MESSAGE");
+    postMessage(compensPayload, "FROM_PAGE_COMPENS");
     setTimeout(() => {
-      postMessage(payloadMessageTutor, "FROM_PAGE_POST-MESSAGE");
-    }, 2000);
+      postMessage(payloadMessagePupil, "FROM_PAGE_POST-MESSAGE");
+      setTimeout(() => {
+        postMessage(payloadMessageTutor, "FROM_PAGE_POST-MESSAGE");
+      }, 3000);
+    }, 3000);
+  };
+
+  const postBL = () => {
+
+    const setQuark = () => {
+      switch (lesson.quarks) {
+        case "profi_60":
+          return "22";
+        case "profi_30":
+          return "2790";
+        case "expert_60":
+          return "33";
+        case "student_60":
+          return "34";
+        default:
+          return "0";
+      }
+    };
+
+    const payload = {
+      pupil_id: lesson.fullIdPupil,
+      real_price: 0,
+      price_id: setQuark(),
+      action: "pay"
+    };
+
+    console.log(payload);
+
+    postMessage(payload, "FROM_PAGE_BL");
+
   };
 
   React.useEffect(() => {
@@ -397,6 +418,10 @@ function App() {
           setCompensStatus(response);
           break;
         case "FROM_CONTENT_POST-MESSAGE":
+          receivedResponse = true;
+          console.log(event.data.data);
+          break;
+        case "FROM_CONTENT_BL":
           console.log(event.data.data);
           break;
         default:
@@ -479,7 +504,7 @@ function App() {
                       renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
                       renew={renew}
                       emailUser={emailPupil}
-                      chatLink={lesson.pupilChat}
+                      chatId={lesson.pupilChat}
                     />
                   </div>
                   <div className="tutorCashComponent">
@@ -495,7 +520,7 @@ function App() {
                       renewMessage={(message, messageText) => renewMessageTutor(message, messageText)}
                       renew={renew}
                       emailUser={emailTutor}
-                      chatLink={lesson.tutorChat}
+                      chatId={lesson.tutorChat}
                     />
                   </div>
                 </div>
@@ -513,7 +538,7 @@ function App() {
                   style={{ display: "inline-block" }}
                   name="testButton"
                   className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={() => multipost()}
+                  onClick={postBL}
           >Тест
           </button>
           <button type="button"
@@ -526,8 +551,8 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.1,
-            02.07.2023). &nbsp;{!isMobileScreen && <a
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.2,
+            04.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
             target="_blank">SuG Extension v1.9.1</a>}
           </div>

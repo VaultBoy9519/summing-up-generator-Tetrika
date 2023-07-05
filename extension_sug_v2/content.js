@@ -29,6 +29,9 @@ window.addEventListener("message", (event) => {
     case "FROM_PAGE_POST-MESSAGE":
       getAndPost("FROM_CONTENT_POST-MESSAGE");
       break;
+    case "FROM_PAGE_BL":
+      getAndPost("FROM_CONTENT_BL");
+      break;
     default:
       isWaitingForResponse = false;
       return;

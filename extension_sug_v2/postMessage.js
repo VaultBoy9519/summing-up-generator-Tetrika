@@ -1,10 +1,11 @@
-const postMessage = (payloadOptions) => {
+const postMessage = (url, payloadOptions) => {
   return new Promise((resolve, reject) => {
 
     let resultStatus;
 
-    fetch("https://mmost.tetrika-school.ru/api/v4/posts", payloadOptions)
+    fetch(url, payloadOptions)
       .then(response => {
+        console.log(url, response);
         resultStatus = response.status;
         console.log(resultStatus);
         resolve(resultStatus);

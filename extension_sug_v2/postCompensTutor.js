@@ -19,6 +19,8 @@ const postCompensTutor = (data, checkCompens) => {
       redirect: "follow"
     };
 
+    console.log(`requestOpt: `, requestOptions);
+
     let statusCompens;
 
     fetch(`https://tetrika-school.ru/adminka/tutors/${data.fullIdTutor}/penalties`, requestOptions)

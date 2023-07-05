@@ -2,7 +2,7 @@ import React from "react";
 import ClipboardJS from "clipboard";
 import AppContext from "./AppContext";
 
-const ResumeField = ({ userRole, message, renewMessage, renew, emailUser, chatLink }) => {
+const ResumeField = ({ userRole, message, renewMessage, renew, emailUser, chatId }) => {
   const copyButtonTextRef = React.useRef(null);
   const copyButtonEmailRef = React.useRef(null);
   const [textIsCopied, setTextIsCopied] = React.useState(false);
@@ -69,8 +69,8 @@ const ResumeField = ({ userRole, message, renewMessage, renew, emailUser, chatLi
       <div>
         <div className="card">
           <div className="d-flex justify-between border">
-            <h5 className="ml-10 mt-5">Для {userRole}&nbsp;{chatLink && <a
-              href={chatLink}
+            <h5 className="ml-10 mt-5">Для {userRole}&nbsp;{chatId && <a
+              href={`https://tetrika-school.ru/chat/${chatId}`}
               target="_blank">(ЧАТ ЛК)</a>}</h5>
             <div>
               <button ref={copyButtonEmailRef} disabled={emailUser === `E-mail`} className="btn btn-email btn-secondary"
