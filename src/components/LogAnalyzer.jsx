@@ -8,6 +8,19 @@ const LogAnalyzer = ({ durationLesson, logs, role }) => {
       styles;
   };
 
+  const styles = (staticStyle, element1, element2) => {
+    return `${staticStyle} ${(() => {
+      switch (logs.clickButtonTp) {
+        case 1:
+          return "bg-warning";
+        case 2:
+          return "bg-danger";
+        default:
+          return "";
+      }
+    })}`;
+  };
+
 
   return (
     <div>
@@ -55,12 +68,16 @@ const LogAnalyzer = ({ durationLesson, logs, role }) => {
           }>{role} нажал кнопку ТП
           </td>
           <td
-            className={
-              logs.clickButtonTp > 1 ?
-                "bg-danger right" : logs.clickButtonTp === 1 ?
-                  "bg-warning right" :
-                  "right"
-            }>{
+            className={`right ${(() => {
+              switch (logs.clickButtonTp) {
+                case 1:
+                  return "bg-warning";
+                case 2:
+                  return "bg-danger";
+                default:
+                  return "";
+              }
+            })()}`}>{
             logs.clickButtonTp !== undefined &&
             logs.clickButtonTp !== 0 ?
               `${logs.clickButtonTp} раз` :

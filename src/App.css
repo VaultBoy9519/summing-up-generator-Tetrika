@@ -92,7 +92,16 @@ body {
 .btn-email {
     height: 70%;
     line-height: 70%;
-    width: 220px;
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.btn-bl {
+    height: 70%;
+    line-height: 70%;
+    max-width: 100px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -141,7 +150,11 @@ textarea:disabled {
     }
 
     .btn {
-        font-size: 12px;
+        font-size: 10px;
+    }
+
+    .journal {
+        min-height: 37px;
     }
 
     .lessonInfo {

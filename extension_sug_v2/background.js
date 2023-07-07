@@ -343,6 +343,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const mmUrl = "https://mmost.tetrika-school.ru/api/v4/posts";
 
       postMessage(mmUrl, payloadOptions)
+        .then(result => {
+          const resultObj = {
+            status: result,
+            user_id: request.data.props.userId
+          };
+          return resultObj;
+        })
         .then(sendResponse, (error) => {
           console.log(error);
         });

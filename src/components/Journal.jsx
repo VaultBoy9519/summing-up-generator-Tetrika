@@ -24,7 +24,7 @@ const Journal = ({ durationLesson, journal, lessonType }) => {
   return (
 
 
-    <div className="btn-group mb-10" style={{ minWidth: "100%" }}>
+    <div className="btn-group mb-10 journal align-items-center" style={{ minWidth: "100%" }}>
       <div className="btn-group dropstart" role="group">
         <button type="button"
                 className={

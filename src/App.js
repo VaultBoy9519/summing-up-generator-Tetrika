@@ -23,17 +23,34 @@ function App() {
   const [renew, setRenew] = React.useState(true);
   const [link, setLink] = React.useState("");
   const [colorLink, setColorLink] = React.useState("white");
-  const [emailPupil, setEmailPupil] = React.useState("E-mail");
-  const [emailTutor, setEmailTutor] = React.useState("E-mail");
-  const [tutorCash, setTutorCash] = React.useState(`0`);
+  const [emailPupil, setEmailPupil] = React.useState("");
+  const [emailTutor, setEmailTutor] = React.useState("");
+  const [tutorCash, setTutorCash] = React.useState("");
   const [messageCompens, setMessageCompens] = React.useState("");
-  const [logsPupil, setLogsPupil] = React.useState({});
-  const [logsTutor, setLogsTutor] = React.useState({});
+  const [logsPupil, setLogsPupil] = React.useState("");
+  const [logsTutor, setLogsTutor] = React.useState("");
   const [compensStatus, setCompensStatus] = React.useState("");
+  const [blStatus, setBlStatus] = React.useState("");
+  const [tutorMessageStatus, setTutorMessageStatus] = React.useState("");
+  const [pupilMessageStatus, setPupilMessageStatus] = React.useState("");
+
+  const [sendStatus, setSendStatus] = React.useState({
+    compens: "",
+    bl: "",
+    pupilMessage: "",
+    tutorMessage: ""
+  });
 
   const isLargeScreen = useMediaQuery("(min-width: 992px)");
   const isSmallScreen = useMediaQuery("(max-width: 991px)");
   const isMobileScreen = useMediaQuery("(max-width: 500px)");
+
+  const setValue = (setter, param, value) => {
+    setter((prev) => ({
+      ...prev,
+      param: value
+    }));
+  };
 
   //Колбэки для получения пропсов из LessonInfo
   const onCreateLesson = (formValues, colorForms, lessonLink) => {
@@ -44,15 +61,20 @@ function App() {
 
   //три функции ниже отвечают за ререндер при нажатии кнопки
   //"Создать", если кто-то хочет вернуть данные после изменений
-  const checkRenew = () => {
+
+  const checkRenew = (setter, message, messageText) => {
     setRenew(false);
+    if (renew === false && message !== "") {
+      setter(messageText);
+    }
   };
 
   const renewMessagePupil = (message, messageText) => {
-    checkRenew(message, messageText);
+    checkRenew(setMessageToPupil, message, messageText);
   };
+
   const renewMessageTutor = (message, messageText) => {
-    checkRenew(message, messageText);
+    checkRenew(setMessageToTutor, message, messageText);
   };
 
   //Колбэк для получения пропса из OptionalRecs
@@ -85,6 +107,7 @@ function App() {
   //функция отвечает только за создание фрагмента со статусом урока
   const createStatusMessage = () => {
     let cash = 0;
+    setTutorCash("");
     //Преобразование даты и времени в корректный формат
     const dayOfWeek = ["понедельник", "вторник", "среда", "четверг", "пятница", "суббота", "воскресенье", "воскресение"];
     const adminkaDateLesson = lesson.dateLesson.split(" ").filter((n) => {
@@ -96,10 +119,7 @@ function App() {
       const formatDate = (date) => {
         return new Date(`2000-01-01T${date}`);
       };
-      const lessonDateTime = formatDate(`${adminkaDateLesson[0]}:00`);
       const beginDateTimePupil = formatDate(logsPupil.beginDate);
-      const endDateTimePupil = formatDate(logsPupil.endDate);
-      const beginDateTimeTutor = formatDate(logsTutor.beginDate);
       const endDateTimeTutor = formatDate(logsTutor.endDate);
 
       const setCashTime = () => {
@@ -119,9 +139,11 @@ function App() {
         setMessageCompens(`Компенсация за отмену урока из-за тех. проблемы ${dateAndTime} (Мск) с ID ${lesson.idPupil}`);
       };
 
+      const compens = lesson.durationLesson === "120" ? 250 : 125;
+
       if (lesson.statusLesson === "1") {
         if (logsPupil.timeCountInLesson !== 0 && logsTutor.timeCountInLesson > cashTime && beginDateTimePupil < endDateTimeTutor) {
-          cash = lesson.tutorCash - 125;
+          cash = lesson.tutorCash - compens;
           setCompensAndMessage(cash);
         }
       } else if (lesson.statusLesson === "7") {
@@ -129,7 +151,7 @@ function App() {
           cash = lesson.tutorCash;
           setCompensAndMessage(cash);
         } else {
-          setCompensAndMessage(125);
+          setCompensAndMessage(compens);
         }
       }
     };
@@ -151,12 +173,9 @@ function App() {
       const keysPupil = Object.keys(statusInfoPupil);
       const keysTutor = Object.keys(statusInfoTutor());
 
-      console.log(cash);
-
       for (let numberStatus = 0; numberStatus <= keysPupil.length; numberStatus++) {
         if (numberStatus === (Number(lesson.statusLesson) - 1)) {
           const statusPupilValue = statusInfoPupil[keysPupil[numberStatus]];
-          console.log(`tutorCash: `, tutorCash);
 
           const checkMVU = () => {
             if (emailTutor.includes("tetrika.school")) {
@@ -167,8 +186,7 @@ function App() {
           };
 
           const tutorOrMvu = checkMVU();
-          console.log(cash);
-          const compensMessage = (cash === lesson.tutorCash || cash === lesson.tutorCash - 125) && cash !== 0 ? ` в размере ставки урока` : ``;
+          const compensMessage = (cash === lesson.tutorCash || cash === lesson.tutorCash - 125) && cash !== "" ? ` в размере ставки урока` : ``;
           const statusTutorValue = statusInfoTutor(compensMessage, tutorOrMvu)[keysTutor[numberStatus]];
           return setStatusLessonMessage(statusPupilValue, statusTutorValue);
         }
@@ -179,6 +197,7 @@ function App() {
   //функция формирует полное сообщение со статусом урока и всеми рекомендациями
   //в зависимости от роли получателя (Tutor/Pupil)
   const createFullMessage = (roleUser) => {
+
     const optRecsKeys = Object.keys(optRecs).filter(key => key.includes(roleUser));
     const messagesKeys = Object.keys(messages);
     const arrMessage = [];
@@ -266,17 +285,37 @@ function App() {
     };
     reset(lesson, setLesson, "");
     reset(optRecs, setOptRecs, false);
-    setLink("");
-    setTutorCash(0);
-    setMessageCompens("");
-    setMessageToPupil("");
-    setMessageToTutor("");
-    setCompensStatus("");
-    setEmailPupil("E-mail");
-    setEmailTutor("E-mail");
-    setLogsPupil({});
-    setLogsTutor({});
+
+    const settersArr = [
+      setLink,
+      setMessageCompens,
+      setMessageToPupil,
+      setMessageToTutor,
+      setCompensStatus,
+      setBlStatus,
+      setEmailPupil,
+      setEmailTutor,
+      setTutorCash,
+      setLogsPupil,
+      setLogsTutor
+    ];
+
+    const setValue = (setters, value) => {
+      setters.forEach(setter => {
+        setter(value);
+      });
+    };
+
+    setValue(settersArr, "");
   };
+
+  React.useEffect(() => {
+    setPupilMessageStatus("");
+  }, [messageToPupil]);
+
+  React.useEffect(() => {
+    setTutorMessageStatus("");
+  }, [messageToTutor]);
 
   React.useEffect(() => {
     let timerId;
@@ -315,7 +354,6 @@ function App() {
         setLogsPupil(data.pupilLogs);
         setLogsTutor(data.tutorLogs);
 
-        console.log(data);
       } else if (data === `404 Not Found`) {
         setLink("");
         highlightInputLink("yellow", 3000);
@@ -329,13 +367,6 @@ function App() {
     };
   }, [link]);
 
-  const compensPayload = {
-    cash: tutorCash,
-    comment: messageCompens,
-    lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
-    adminName: lesson.adminName,
-    fullIdTutor: lesson.fullIdTutor
-  };
 
   function PayloadMessage(chatId, message, fullId) {
     this.channel_id = chatId && chatId;
@@ -351,56 +382,119 @@ function App() {
   const payloadMessagePupil = new PayloadMessage(lesson.pupilChat, messageToPupil, lesson.fullIdPupil);
   const payloadMessageTutor = new PayloadMessage(lesson.tutorChat, messageToTutor, lesson.fullIdTutor);
 
-  const postMessage = (payload, type) => {
+  const postMessage = (payload, type, status, setStatus) => {
 
-    window.postMessage(
-      {
-        type: type,
-        data: payload
-      },
-      "*"
-    );
-  };
-
-  const multipost = () => {
-    postMessage(compensPayload, "FROM_PAGE_COMPENS");
-    setTimeout(() => {
-      postMessage(payloadMessagePupil, "FROM_PAGE_POST-MESSAGE");
-      setTimeout(() => {
-        postMessage(payloadMessageTutor, "FROM_PAGE_POST-MESSAGE");
-      }, 3000);
-    }, 3000);
-  };
-
-  const postBL = () => {
-
-    const setQuark = () => {
-      switch (lesson.quarks) {
-        case "profi_60":
-          return "22";
-        case "profi_30":
-          return "2790";
-        case "expert_60":
-          return "33";
-        case "student_60":
-          return "34";
-        default:
-          return "0";
+    if (setStatus) {
+      if (status === "" || status >= 400) {
+        setStatus("");
+        window.postMessage(
+          {
+            type: type,
+            data: payload
+          },
+          "*"
+        );
+      } else {
+        setStatus("Уже отправлено");
       }
-    };
 
-    const payload = {
-      pupil_id: lesson.fullIdPupil,
-      real_price: 0,
-      price_id: setQuark(),
-      action: "pay"
-    };
-
-    console.log(payload);
-
-    postMessage(payload, "FROM_PAGE_BL");
+    }
 
   };
+
+  const postCompensTutor = async () => {
+    return new Promise((resolve) => {
+      const compensPayload = {
+        cash: tutorCash,
+        comment: messageCompens,
+        lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
+        adminName: lesson.adminName,
+        fullIdTutor: lesson.fullIdTutor
+      };
+
+      window.postMessage(
+        {
+          type: "FROM_PAGE_COMPENS",
+          data: compensPayload
+        },
+        "*"
+      );
+      resolve();
+    });
+  };
+
+  const [sendMessages, setSendMessages] = React.useState({
+    tutor: "",
+    pupil: ""
+  });
+
+
+  const postAndCheckMessage = (payload, message, status, setStatus) => {
+
+    if (payload.props.userId) {
+      const role = payload.props.userId === lesson.fullIdTutor ? "tutor" : "pupil";
+      if (message !== "") {
+        console.log(`Роль - `, role);
+
+        if (sendMessages[role] !== message) {
+          console.log(`Сообщение еще не отправлялось`);
+
+          postMessage(payload, "FROM_PAGE_POST-MESSAGE", status, setStatus);
+
+          setValue(setSendMessages, role, message);
+
+        } else {
+          setStatus("Уже отправлено");
+        }
+
+      } else {
+        console.log("Сообщение пустое");
+      }
+    }
+
+    return true;
+
+  };
+
+  const messagesConsole = () => {
+    console.log(`Сообщение уже было отправлено? `, sendMessages.pupil === messageToPupil);
+    // setPupilMessageStatus("");
+    console.log(messageToPupil);
+  };
+
+  // postAndCheckMessage(payloadMessagePupil, messageToPupil, pupilMessageStatus, setPupilMessageStatus);
+
+  const postBL = async () => {
+    return new Promise((resolve) => {
+      const setQuark = () => {
+        switch (lesson.quarks) {
+          case "profi_60":
+          case "profi_120":
+            return "22";
+          case "profi_30":
+            return "2790";
+          case "expert_60":
+            return "33";
+          case "student_60":
+            return "34";
+          default:
+            return "0";
+        }
+      };
+
+      const payload = {
+        pupil_id: lesson.fullIdPupil,
+        real_price: 0,
+        price_id: setQuark(),
+        action: "pay"
+      };
+
+      postMessage(payload, "FROM_PAGE_BL", blStatus, setBlStatus);
+
+      resolve();
+    });
+  };
+
 
   React.useEffect(() => {
     let receivedResponse = false;
@@ -419,10 +513,18 @@ function App() {
           break;
         case "FROM_CONTENT_POST-MESSAGE":
           receivedResponse = true;
-          console.log(event.data.data);
+          const data = event.data.data;
+          if (data.user_id === lesson.fullIdTutor) {
+            setTutorMessageStatus(data.status);
+            console.log(`Статус отправки преподу: `, data.status);
+          } else if (data.user_id === lesson.fullIdPupil) {
+            setPupilMessageStatus(data.status);
+            console.log(`Статус отправки ученику: `, data.status);
+          }
           break;
         case "FROM_CONTENT_BL":
-          console.log(event.data.data);
+          console.log(`Статус БУ: `, event.data.data);
+          setBlStatus(event.data.data);
           break;
         default:
           return;
@@ -435,6 +537,19 @@ function App() {
 
 // Передача сообщения любым слушателям в окнах
   window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
+
+  const multipost = async () => {
+    if (messageToPupil !== "" && messageToTutor !== "") {
+      await postBL();
+      await postCompensTutor();
+    } else {
+      console.log(`Сообщения пустые`);
+    }
+  };
+
+
+  // postAndCheckMessage(payloadMessagePupil, messageToPupil, pupilMessageStatus, setPupilMessageStatus);
+  // postAndCheckMessage(payloadMessageTutor, messageToTutor, tutorMessageStatus, setTutorMessageStatus);
 
   return (
     <AppContext.Provider value={{ color, optRecs, lesson, link, colorLink }}>
@@ -500,7 +615,12 @@ function App() {
                   <div className="col-lg-12 resumePupil">
                     <ResumeField
                       userRole={"У"}
+                      postMessage={() => postAndCheckMessage(payloadMessagePupil, messageToPupil, pupilMessageStatus, setPupilMessageStatus)}
+                      postMessageStatus={pupilMessageStatus}
                       message={messageToPupil}
+                      blStatus={blStatus}
+                      postBl={lesson.quarks && postBL}
+                      lessonStatus={lesson.statusLesson}
                       renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
                       renew={renew}
                       emailUser={emailPupil}
@@ -511,12 +631,14 @@ function App() {
                     <TutorCash
                       tutorCash={tutorCash}
                       compensStatus={compensStatus}
-                      postCompensTutor={() => postMessage(compensPayload, "FROM_PAGE_COMPENS")} />
+                      postCompensTutor={lesson.tutorCash && postCompensTutor} />
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
                       userRole={emailTutor.includes("tetrika.school") ? "МВУ" : "П"}
                       message={messageToTutor}
+                      postMessage={() => postAndCheckMessage(payloadMessageTutor, messageToTutor, tutorMessageStatus, setTutorMessageStatus)}
+                      postMessageStatus={tutorMessageStatus}
                       renewMessage={(message, messageText) => renewMessageTutor(message, messageText)}
                       renew={renew}
                       emailUser={emailTutor}
@@ -535,11 +657,11 @@ function App() {
                   onClick={generateSummary}>Создать
           </button>
           <button type="button"
-                  style={{ display: "inline-block" }}
+                  style={lesson.statusLesson === "7" ? {} : { display: "none" }}
                   name="testButton"
-                  className="btn btn-primary btn-lg mx-auto mx-lg-0 mt-10 ml-10"
-                  onClick={postBL}
-          >Тест
+                  className="btn btn-warning btn-lg mx-auto mx-lg-0 mt-10 ml-10"
+                  onClick={multipost}
+          >Компенсировать
           </button>
           <button type="button"
                   name="clearButton"
@@ -551,10 +673,10 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.2,
-            04.07.2023). &nbsp;{!isMobileScreen && <a
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.3,
+            07.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.9.1</a>}
+            target="_blank">SuG Extension v1.9.2</a>}
           </div>
         </div>
       </div>
