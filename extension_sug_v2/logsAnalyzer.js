@@ -116,7 +116,7 @@ const logsAnalyzer = async (
       if (logs.length > 0) {
         let beginDate;
         let endDate;
-        if (events.length > 0) {
+        if (filterEvents.length > 0) {
           beginDate = filterEvents[0].dateTime < logs[0].dateTime ?
             filterEvents[0].dateTime < formatLessonDate ?
               formatLessonDate :

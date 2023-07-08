@@ -31,7 +31,6 @@ function App() {
   const [logsPupil, setLogsPupil] = React.useState("");
   const [logsTutor, setLogsTutor] = React.useState("");
 
-
   const empty = [
     "messageToPupil",
     "messageToTutor",
@@ -293,47 +292,6 @@ function App() {
     }
   };
 
-  const setCheckReset = () => {
-    const reset = (obj, setObj, value) => {
-      let reset = {};
-      for (let element in obj) {
-        if (element === "statusLesson") {
-          reset[element] = "0";
-        } else {
-          reset[element] = value;
-        }
-      }
-      setObj(reset);
-    };
-    reset(lesson, setLesson, "");
-    reset(optRecs, setOptRecs, false);
-
-    const settersArr = [
-      setLink,
-      setMessageCompens,
-      setMessageToPupil,
-      setMessageToTutor,
-      setEmailPupil,
-      setEmailTutor,
-      setTutorCash,
-      setLogsPupil,
-      setLogsTutor
-    ];
-
-    const setNullValue = (setters, value) => {
-      setters.forEach(setter => {
-        setter(value);
-      });
-    };
-
-    setNullValue(settersArr, "");
-
-    for (let key in sendStatus) {
-      setValue(setSendStatus, key, "");
-    }
-
-  };
-
   React.useEffect(() => {
     setValue(setSendStatus, "pupilMessage", "");
   }, [messageToPupil]);
@@ -404,10 +362,84 @@ function App() {
     };
   }
 
+  const sendMessage = () => {
+    return new Promise((resolve) => {
+      let receivedResponse = false;
+
+      window.addEventListener("message", async (event) => {
+        if (event.source !== window) {
+          return;
+        }
+
+        switch (event.data.type) {
+          case "FROM_CONTENT_COMPENS":
+            receivedResponse = true;
+            const response = event.data.data;
+            console.log(response);
+            setValue(setSendStatus, "compens", response);
+            break;
+
+          case "FROM_CONTENT_POST-MESSAGE":
+            receivedResponse = true;
+            const data = event.data.data;
+            if (data.user_id === lesson.fullIdTutor) {
+              setValue(setSendStatus, "tutorMessage", data.status);
+              console.log(`Статус отправки преподу: `, data.status);
+            } else if (data.user_id === lesson.fullIdPupil) {
+              setValue(setSendStatus, "pupilMessage", data.status);
+              console.log(`Статус отправки ученику: `, data.status);
+            }
+            console.log(sendStatus);
+            break;
+
+          case "FROM_CONTENT_BL":
+            receivedResponse = true;
+            console.log(`Статус БУ: `, event.data.data);
+            setValue(setSendStatus, "bl", event.data.data);
+            break;
+          default:
+            return;
+        }
+        resolve(event.data.data);
+      });
+    });
+  };
+
   const payloadMessagePupil = new PayloadMessage(lesson.pupilChat, messageToPupil, lesson.fullIdPupil);
   const payloadMessageTutor = new PayloadMessage(lesson.tutorChat, messageToTutor, lesson.fullIdTutor);
 
-  const postMessage = (payload, type, status) => {
+  const setQuark = () => {
+    switch (lesson.quarks) {
+      case "profi_60":
+      case "profi_120":
+        return "22";
+      case "profi_30":
+        return "2790";
+      case "expert_60":
+        return "33";
+      case "student_60":
+        return "34";
+      default:
+        return "0";
+    }
+  };
+
+  const blPayload = {
+    pupil_id: lesson.fullIdPupil,
+    real_price: 0,
+    price_id: setQuark(),
+    action: "pay"
+  };
+
+  const compensPayload = {
+    cash: tutorCash,
+    comment: messageCompens,
+    lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
+    adminName: lesson.adminName,
+    fullIdTutor: lesson.fullIdTutor
+  };
+
+  const postMessage = async (payload, type, status) => {
 
     if (sendStatus[status] === "" || sendStatus[status] >= 400) {
       setValue(setSendStatus, status, "");
@@ -418,31 +450,12 @@ function App() {
         },
         "*"
       );
+      await sendMessage();
+      return true;
     } else {
       setValue(setSendStatus, status, "Уже отправлено");
     }
 
-  };
-
-  const postCompensTutor = async () => {
-    return new Promise((resolve) => {
-      const compensPayload = {
-        cash: tutorCash,
-        comment: messageCompens,
-        lessonId: link.includes(`tetrika-school.ru`) ? link.replace("https://tetrika-school.ru/adminka/lessons/", "") : link,
-        adminName: lesson.adminName,
-        fullIdTutor: lesson.fullIdTutor
-      };
-
-      window.postMessage(
-        {
-          type: "FROM_PAGE_COMPENS",
-          data: compensPayload
-        },
-        "*"
-      );
-      resolve();
-    });
   };
 
   const [sendMessages, setSendMessages] = React.useState({
@@ -451,21 +464,16 @@ function App() {
   });
 
 
-  const postAndCheckMessage = (payload, message, status) => {
+  const postAndCheckMessage = async (payload, message, status) => {
 
     if (payload.props.userId) {
       const role = payload.props.userId === lesson.fullIdTutor ? "tutor" : "pupil";
       if (message !== "") {
-        console.log(`Роль - `, role);
-
-        if (sendMessages[role] !== message) {
-          console.log(`Сообщение еще не отправлялось`);
-
-          postMessage(payload, "FROM_PAGE_POST-MESSAGE", status);
-
+        console.log(`Проверка статуса:`, sendStatus[status]);
+        if (sendMessages[role] !== message || sendStatus[status] >= 400) {
+          await postMessage(payload, "FROM_PAGE_POST-MESSAGE", status);
           setValue(setSendMessages, role, message);
-
-        } else {
+        } else if (!(sendStatus[status] >= 400)) {
           setValue(setSendStatus, status, "Уже отправлено");
         }
 
@@ -478,95 +486,17 @@ function App() {
 
   };
 
-  const postBL = () => {
-
-    const setQuark = () => {
-      switch (lesson.quarks) {
-        case "profi_60":
-        case "profi_120":
-          return "22";
-        case "profi_30":
-          return "2790";
-        case "expert_60":
-          return "33";
-        case "student_60":
-          return "34";
-        default:
-          return "0";
-      }
-    };
-
-
-    const payload = {
-      pupil_id: lesson.fullIdPupil,
-      real_price: 0,
-      price_id: setQuark(),
-      action: "pay"
-    };
-
-    postMessage(payload, "FROM_PAGE_BL", "bl");
-
-  };
-
-
-  React.useEffect(() => {
-    let receivedResponse = false;
-
-    window.addEventListener("message", async (event) => {
-      if (event.source !== window) {
-        return;
-      }
-
-      switch (event.data.type) {
-        case "FROM_CONTENT_COMPENS":
-          receivedResponse = true;
-          const response = event.data.data;
-          console.log(response);
-          setValue(setSendStatus, "compens", response);
-          break;
-
-        case "FROM_CONTENT_POST-MESSAGE":
-          receivedResponse = true;
-          const data = event.data.data;
-          if (data.user_id === lesson.fullIdTutor) {
-            setValue(setSendStatus, "tutorMessage", data.status);
-            console.log(`Статус отправки преподу: `, data.status);
-          } else if (data.user_id === lesson.fullIdPupil) {
-            setValue(setSendStatus, "pupilMessage", data.status);
-            console.log(`Статус отправки ученику: `, data.status);
-          }
-          console.log(sendStatus);
-          break;
-
-        case "FROM_CONTENT_BL":
-          console.log(`Статус БУ: `, event.data.data);
-          setValue(setSendStatus, "bl", event.data.data);
-          break;
-        default:
-          return;
-      }
-
-
-    });
-  });
-
-
 // Передача сообщения любым слушателям в окнах
   window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
 
-  const multipost = () => {
+  const multiPost = async () => {
     if (messageToPupil !== "" && messageToTutor !== "") {
-      const timeout = (func, timer) => {
-        setTimeout(() => {
-          func();
-        }, timer);
-      };
-      postBL();
-      timeout(postCompensTutor, 2000);
-      timeout(() => postAndCheckMessage(payloadMessagePupil, messageToPupil, "pupilMessage"), 3200);
-      timeout(() => {
-        postAndCheckMessage(payloadMessageTutor, messageToTutor, "tutorMessage");
-      }, 5200);
+
+      await postMessage(blPayload, "FROM_PAGE_BL", "bl");
+      await postMessage(compensPayload, "FROM_PAGE_COMPENS", "compens");
+      await postAndCheckMessage(payloadMessagePupil, messageToPupil, "pupilMessage");
+      await postAndCheckMessage(payloadMessageTutor, messageToTutor, "tutorMessage");
+
     } else {
       console.log(`Сообщения пустые`);
     }
@@ -582,7 +512,7 @@ function App() {
     let success = true;
 
     for (let key in status) {
-      if ((status[key] >= 400 || status[key] === false) && status[key] !== "") {
+      if (status[key] >= 400 && status[key] !== "") {
         success = false;
       } else if (status[key] === "" || status[key] === "Уже отправлено") {
         success = "warning";
@@ -598,6 +528,47 @@ function App() {
         return "btn-warning";
       }
     })()}`;
+  };
+
+  const setCheckReset = () => {
+    const reset = (obj, setObj, value) => {
+      let reset = {};
+      for (let element in obj) {
+        if (element === "statusLesson") {
+          reset[element] = "0";
+        } else {
+          reset[element] = value;
+        }
+      }
+      setObj(reset);
+    };
+    reset(lesson, setLesson, "");
+    reset(optRecs, setOptRecs, false);
+
+    const settersArr = [
+      setLink,
+      setMessageCompens,
+      setMessageToPupil,
+      setMessageToTutor,
+      setEmailPupil,
+      setEmailTutor,
+      setTutorCash,
+      setLogsPupil,
+      setLogsTutor
+    ];
+
+    const setNullValue = (setters, value) => {
+      setters.forEach(setter => {
+        setter(value);
+      });
+    };
+
+    setNullValue(settersArr, "");
+
+    for (let key in sendStatus) {
+      setValue(setSendStatus, key, "");
+    }
+
   };
 
   return (
@@ -668,7 +639,7 @@ function App() {
                       postMessageStatus={sendStatus.pupilMessage}
                       message={messageToPupil}
                       blStatus={sendStatus.bl}
-                      postBl={postBL}
+                      postBl={() => postMessage(blPayload, "FROM_PAGE_BL", "bl")}
                       lessonStatus={lesson.statusLesson}
                       renewMessage={(message, messageText) => renewMessagePupil(message, messageText)}
                       renew={renew}
@@ -680,7 +651,7 @@ function App() {
                     <TutorCash
                       tutorCash={tutorCash}
                       compensStatus={sendStatus.compens}
-                      postCompensTutor={postCompensTutor} />
+                      postCompensTutor={() => postMessage(compensPayload, "FROM_PAGE_COMPENS", "compens")} />
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
@@ -707,10 +678,16 @@ function App() {
           </button>
           <button type="button"
                   style={lesson.statusLesson === "7" ? {} : { display: "none" }}
-                  name="testButton"
+                  name="cancelCompensButton"
                   className={setClasses("btn btn-lg mx-auto mx-lg-0 mt-10 ml-10", sendStatus)}
-                  onClick={multipost}
-          >Компенсировать
+                  onClick={multiPost}
+          >{
+            setClasses("", sendStatus).includes("btn-danger") ?
+              "Ошибка" :
+              setClasses("", sendStatus).includes("btn-success") ?
+                "Успешно" :
+                "Компенсировать"
+          }
           </button>
           <button type="button"
                   className={"btn btn-lg mx-auto mx-lg-0 mt-10 ml-10 btn-primary"}
@@ -727,10 +704,10 @@ function App() {
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.4,
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.5,
             08.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.9.2</a>}
+            target="_blank">SuG Extension v1.9.3</a>}
           </div>
         </div>
       </div>

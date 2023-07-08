@@ -55,7 +55,7 @@ describe.only("Тестирование генератора в ручном р�
   beforeEach(() => {
     // cy.postAuth();
     cy.visit("http://localhost:3000/summing-up-generator-Tetrika");
-    cy.get("p.titleGen").should("contain.text", "Генератор резюмирования");
+    cy.get("p.titleGen").should("contain.text", "Анализатор уроков");
   });
 
   const checkFields = (pupilMessage, tutorMessage, textNotEmpty) => {

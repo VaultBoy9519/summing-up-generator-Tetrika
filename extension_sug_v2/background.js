@@ -76,7 +76,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                   const userLink = `https://tetrika-school.ru/adminka/${json.role}s/${userId}`;
                   const doc = await getDocumentHtml(userLink);
                   const chatId = getHrefId("/chat/", doc);
-                  console.log(chatId);
                   if (json.role === "tutor") {
                     const tutorFullName = json.name.split(" ");
                     const firstElement = tutorFullName.shift();
@@ -281,49 +280,55 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
       break;
 
-    case "FROM_CONTENT_COMPENS": {
-      //Отправка компенсации П и проверка ее наличия
-      const data = request.data;
+    case "FROM_CONTENT_BL": {
+      //Начисление БУ У
+      const body = new URLSearchParams(request.data);
 
-      const checkCompens = (doc) => {
-        const table = doc.querySelector(".table-bordered");
-        const rows = table.querySelectorAll("tbody tr");
-
-        let status;
-
-        rows.forEach((row) => {
-          const sum = (row.querySelector("td:nth-child(1)").textContent);
-          const sumFixed = parseFloat(Number(sum).toFixed(2));
-          const comment = row.querySelector("td:nth-child(4)").textContent;
-          const adminName = row.querySelector("td:nth-child(5)").textContent;
-
-
-          if (sumFixed === data.cash && comment === data.comment && adminName === data.adminName) {
-            console.log(`Компенсация добавлена успешно`);
-            status = true;
-          } else {
-            console.log(`Компенсация не найдена, ошибка`);
-            status = false;
-          }
-        });
-        return status;
+      const requestOptions = {
+        method: "POST",
+        body: body,
+        redirect: "follow",
+        credentials: "include"
       };
 
-      if (data.cash > 0) {
-        getDocumentHtml(`https://tetrika-school.ru/adminka/tutors/${data.fullIdTutor}/penalties`)
-          .then(doc => {
-            if (checkCompens(doc) === true) {
-              sendResponse(`Уже выполнен`);
-            } else {
-              postCompensTutor(data, checkCompens)
-                .then(sendResponse, (error) => {
-                  console.log(error);
-                });
-            }
-          });
-      } else {
-        sendResponse(``);
-      }
+      const pupilUrl = `https://tetrika-school.ru/adminka/pupils/${request.data.pupil_id}/subject_make_payment?price_group=by_admin&subject=&tutor_qualification=&duration=`;
+
+      postMessage(pupilUrl, requestOptions)
+        .then(sendResponse, (error) => {
+          console.log(error);
+        });
+    }
+      break;
+    
+    case "FROM_CONTENT_COMPENS": {
+
+      //Отправка компенсации П
+      const data = request.data;
+
+      const params = {
+        charge: data.cash,
+        reason: data.comment,
+        additional_info: data.adminName,
+        event_id: "",
+        lesson_id: data.lessonId,
+        action: "new_penalty"
+      };
+
+      const requestBody = new URLSearchParams(params);
+
+      const payloadOptions = {
+        credentials: "include",
+        method: "POST",
+        body: requestBody,
+        redirect: "follow"
+      };
+
+      const url = `https://tetrika-school.ru/adminka/tutors/${data.fullIdTutor}/penalties`;
+
+      postMessage(url, payloadOptions)
+        .then(sendResponse, (error) => {
+          console.log(error);
+        });
     }
       break;
 
@@ -344,11 +349,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       postMessage(mmUrl, payloadOptions)
         .then(result => {
-          const resultObj = {
+          return {
             status: result,
             user_id: request.data.props.userId
           };
-          return resultObj;
         })
         .then(sendResponse, (error) => {
           console.log(error);
@@ -356,28 +360,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
       break;
 
-    case "FROM_CONTENT_BL": {
-      //Начисление БУ У
-      const body = new URLSearchParams(request.data);
-
-      const requestOptions = {
-        method: "POST",
-        body: body,
-        redirect: "follow",
-        credentials: "include"
-      };
-
-      const pupilUrl = `https://tetrika-school.ru/adminka/pupils/${request.data.pupil_id}/subject_make_payment?price_group=by_admin&subject=&tutor_qualification=&duration=`;
-
-      postMessage(pupilUrl, requestOptions)
-        .then(sendResponse, (error) => {
-          console.log(error);
-        });
-    }
-      break;
     default:
       return;
   }
 
-  return true; // Возвращаем true для указания на то, что мы будем отправлять ответ асинхронно
+  return true;
 });
