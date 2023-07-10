@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "LA Extension v2",
   "description": "Полное взаимодействие с админкой урока",
-  "version": "1.9.3",
+  "version": "1.9.4",
   "icons": {
     "128": "logo.png"
   },

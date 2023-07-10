@@ -126,6 +126,7 @@ textarea:disabled {
 
 .textColor {
     color: white;
+    pointer-events: none;
 }
 
 .button-div {

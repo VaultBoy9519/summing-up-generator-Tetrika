@@ -4,7 +4,7 @@ import React from "react";
 export const TutorCash = ({ tutorCash, compensStatus, postCompensTutor }) => {
 
   const compensMessages = [`Компенсация успешно начислена`, `Компенсация выполнена ранее`, `Не удалось начислить компенсацию`, ""];
-  const classesCash = ["input-group-text bg-success border-0", "input-group-text bg-warning border-0", "input-group-text bg-danger border-0", "input-group-text bg-secondary border-0 textColor"];
+  const classesCash = ["input-group-text bg-success border-0 textColor", "input-group-text bg-warning border-0", "input-group-text bg-danger border-0", "input-group-text bg-secondary border-0 textColor"];
   const classesButton = ["btn btn-success", "btn btn-warning", "btn btn-danger", "btn btn-secondary"];
 
   const compensMessage = (status, arr) => {

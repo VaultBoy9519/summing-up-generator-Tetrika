@@ -294,12 +294,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const pupilUrl = `https://tetrika-school.ru/adminka/pupils/${request.data.pupil_id}/subject_make_payment?price_group=by_admin&subject=&tutor_qualification=&duration=`;
 
       postMessage(pupilUrl, requestOptions)
+        .then(result => {
+          return result.status;
+        })
         .then(sendResponse, (error) => {
           console.log(error);
         });
     }
       break;
-    
+
     case "FROM_CONTENT_COMPENS": {
 
       //Отправка компенсации П
@@ -326,6 +329,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const url = `https://tetrika-school.ru/adminka/tutors/${data.fullIdTutor}/penalties`;
 
       postMessage(url, payloadOptions)
+        .then(result => {
+          return result.status;
+        })
         .then(sendResponse, (error) => {
           console.log(error);
         });
@@ -347,16 +353,53 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
       const mmUrl = "https://mmost.tetrika-school.ru/api/v4/posts";
 
-      postMessage(mmUrl, payloadOptions)
-        .then(result => {
-          return {
-            status: result,
-            user_id: request.data.props.userId
-          };
-        })
-        .then(sendResponse, (error) => {
-          console.log(error);
-        });
+      const result = {};
+
+      const sendMessage = () => {
+        postMessage(mmUrl, payloadOptions)
+          .then(response => {
+            result.status = response.status;
+            console.log(response);
+            return response.json();
+          })
+          .then(json => {
+              console.log(json);
+              result.message_id = json.id;
+              result.user_id = json.props.userId;
+              return result;
+            }
+          )
+          .then(sendResponse, (error) => {
+            console.log(error);
+          });
+      };
+
+      if (request.data.message_id !== "") {
+
+        const messageUrl = `${mmUrl}/${request.data.message_id}`;
+        
+        const deletePayload = {
+          method: "DELETE",
+          body: new URLSearchParams(),
+          redirect: "follow",
+          credentials: "include"
+        };
+
+        postMessage(messageUrl, deletePayload)
+          .then(r => r.status)
+          .then(status => {
+            if (status >= 400) {
+              result.status = status;
+              result.message_id = request.data.message_id;
+              result.user_id = request.data.props.userId;
+              sendResponse(result);
+            } else {
+              sendMessage();
+            }
+          });
+      } else {
+        sendMessage();
+      }
     }
       break;
 

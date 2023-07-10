@@ -31,7 +31,7 @@ function App() {
   const [logsPupil, setLogsPupil] = React.useState("");
   const [logsTutor, setLogsTutor] = React.useState("");
 
-  const empty = [
+  const emptyKeys = [
     "messageToPupil",
     "messageToTutor",
     "link",
@@ -43,7 +43,7 @@ function App() {
     "logsTutor"
   ];
 
-  const status = [
+  const statusKeys = [
     "compens",
     "bl",
     "pupilMessage",
@@ -58,9 +58,9 @@ function App() {
     return obj;
   };
 
-  const [info, setInfo] = React.useState(createData(empty, ""));
+  const [info, setInfo] = React.useState(createData(emptyKeys, ""));
 
-  const [sendStatus, setSendStatus] = React.useState(createData(status, ""));
+  const [sendStatus, setSendStatus] = React.useState(createData(statusKeys, ""));
 
   const isLargeScreen = useMediaQuery("(min-width: 992px)");
   const isSmallScreen = useMediaQuery("(max-width: 991px)");
@@ -82,7 +82,6 @@ function App() {
 
   //три функции ниже отвечают за ререндер при нажатии кнопки
   //"Создать", если кто-то хочет вернуть данные после изменений
-
   const checkRenew = (setter, message, messageText) => {
     setRenew(false);
     if (renew === false && message !== "") {
@@ -336,7 +335,6 @@ function App() {
         setEmailTutor(data.emailTutor);
         setLogsPupil(data.pupilLogs);
         setLogsTutor(data.tutorLogs);
-
       } else if (data === `404 Not Found`) {
         setLink("");
         highlightInputLink("yellow", 3000);
@@ -352,6 +350,7 @@ function App() {
 
 
   function PayloadMessage(chatId, message, fullId) {
+    this.message_id = fullId === lesson.fullIdTutor ? sendMessages["tutorMessageId"] : sendMessages["pupilMessageId"];
     this.channel_id = chatId && chatId;
     this.message = message;
     this.file_ids = [];
@@ -361,6 +360,10 @@ function App() {
       isTechIssue: false
     };
   }
+
+  const sendMessagesKeys = ["tutor", "pupil", "tutorMessageId", "pupilMessageId"];
+
+  const [sendMessages, setSendMessages] = React.useState(createData(sendMessagesKeys, ""));
 
   const sendMessage = () => {
     return new Promise((resolve) => {
@@ -382,12 +385,17 @@ function App() {
           case "FROM_CONTENT_POST-MESSAGE":
             receivedResponse = true;
             const data = event.data.data;
+            console.log(data);
+
+            const setData = (status, messageId) => {
+              setValue(setSendStatus, status, data.status);
+              setValue(setSendMessages, messageId, data.message_id);
+            };
+
             if (data.user_id === lesson.fullIdTutor) {
-              setValue(setSendStatus, "tutorMessage", data.status);
-              console.log(`Статус отправки преподу: `, data.status);
+              setData("tutorMessage", "tutorMessageId");
             } else if (data.user_id === lesson.fullIdPupil) {
-              setValue(setSendStatus, "pupilMessage", data.status);
-              console.log(`Статус отправки ученику: `, data.status);
+              setData("pupilMessage", "pupilMessageId");
             }
             console.log(sendStatus);
             break;
@@ -458,11 +466,6 @@ function App() {
 
   };
 
-  const [sendMessages, setSendMessages] = React.useState({
-    tutor: "",
-    pupil: ""
-  });
-
 
   const postAndCheckMessage = async (payload, message, status) => {
 
@@ -471,6 +474,9 @@ function App() {
       if (message !== "") {
         console.log(`Проверка статуса:`, sendStatus[status]);
         if (sendMessages[role] !== message || sendStatus[status] >= 400) {
+          if (sendStatus[status] >= 200 && sendStatus[status] <= 400) {
+
+          }
           await postMessage(payload, "FROM_PAGE_POST-MESSAGE", status);
           setValue(setSendMessages, role, message);
         } else if (!(sendStatus[status] >= 400)) {
@@ -486,16 +492,30 @@ function App() {
 
   };
 
+  const postCompensTutor = async () => {
+    if (tutorCash > 0) {
+      await postMessage(compensPayload, "FROM_PAGE_COMPENS", "compens");
+    }
+    return true;
+  };
+
 // Передача сообщения любым слушателям в окнах
   window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
 
   const multiPost = async () => {
     if (messageToPupil !== "" && messageToTutor !== "") {
 
-      await postMessage(blPayload, "FROM_PAGE_BL", "bl");
-      await postMessage(compensPayload, "FROM_PAGE_COMPENS", "compens");
       await postAndCheckMessage(payloadMessagePupil, messageToPupil, "pupilMessage");
       await postAndCheckMessage(payloadMessageTutor, messageToTutor, "tutorMessage");
+
+      if (lesson.statusLesson === "1") {
+        await postCompensTutor();
+      }
+
+      if (lesson.statusLesson === "7") {
+        await postMessage(blPayload, "FROM_PAGE_BL", "bl");
+        await postCompensTutor();
+      }
 
     } else {
       console.log(`Сообщения пустые`);
@@ -505,17 +525,26 @@ function App() {
   const logger = () => {
     console.log(sendStatus);
     console.log(sendMessages);
-    console.log(info);
+    console.log(payloadMessagePupil);
+    console.log(payloadMessageTutor);
   };
 
   const setClasses = (standart, status) => {
     let success = true;
 
     for (let key in status) {
+      if (tutorCash === "" && key === "compens") {
+        continue;
+      }
+      if (lesson.statusLesson !== "7" && key === "bl") {
+        continue;
+      }
       if (status[key] >= 400 && status[key] !== "") {
         success = false;
-      } else if (status[key] === "" || status[key] === "Уже отправлено") {
+      } else if (status[key] === "Уже отправлено") {
         success = "warning";
+      } else if (status[key] === "") {
+        success = "";
       }
     }
 
@@ -526,7 +555,10 @@ function App() {
         return "btn-danger";
       } else if (success === "warning") {
         return "btn-warning";
+      } else if (success === "") {
+        return "btn-secondary";
       }
+
     })()}`;
   };
 
@@ -570,6 +602,14 @@ function App() {
     }
 
   };
+
+  React.useEffect(() => {
+
+    if (link !== "") {
+      generateSummary();
+    }
+
+  }, [lesson, optRecs]);
 
   return (
     <AppContext.Provider value={{ color, optRecs, lesson, link, colorLink }}>
@@ -651,7 +691,7 @@ function App() {
                     <TutorCash
                       tutorCash={tutorCash}
                       compensStatus={sendStatus.compens}
-                      postCompensTutor={() => postMessage(compensPayload, "FROM_PAGE_COMPENS", "compens")} />
+                      postCompensTutor={postCompensTutor} />
                   </div>
                   <div className="col-lg-12 resumeTutor">
                     <ResumeField
@@ -670,26 +710,23 @@ function App() {
             </div>
           </div>
         </div>
-        <div className="button-div mainButtons">
+        <div className="button-div">
           <button type="button"
-                  name="createButton"
-                  className="btn btn-secondary bg-gradient btn-lg w-200 mx-auto mx-lg-0 mt-10"
-                  onClick={generateSummary}>Создать
-          </button>
-          <button type="button"
-                  style={lesson.statusLesson === "7" ? {} : { display: "none" }}
                   name="cancelCompensButton"
-                  className={setClasses("btn btn-lg mx-auto mx-lg-0 mt-10 ml-10", sendStatus)}
+                  className={setClasses("btn btn-lg mx-auto mx-lg-0 mt-10", sendStatus)}
                   onClick={multiPost}
           >{
             setClasses("", sendStatus).includes("btn-danger") ?
               "Ошибка" :
               setClasses("", sendStatus).includes("btn-success") ?
                 "Успешно" :
-                "Компенсировать"
+                setClasses("", sendStatus).includes("btn-warning") ?
+                  "Уже отправлено" :
+                  "Отправить всем"
           }
           </button>
           <button type="button"
+                  style={{ display: "none" }}
                   className={"btn btn-lg mx-auto mx-lg-0 mt-10 ml-10 btn-primary"}
                   onClick={logger}
           >Консоль
@@ -699,15 +736,14 @@ function App() {
                   className="btn btn-secondary bg-gradient btn-lg mx-auto mx-lg-0 mt-10 ml-10"
                   onClick={setCheckReset}>Очистить
           </button>
-
         </div>
         <div>
           <div className="versionText">
             Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.5,
+                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.6,
             08.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.9.3</a>}
+            target="_blank">SuG Extension v1.9.4</a>}
           </div>
         </div>
       </div>
