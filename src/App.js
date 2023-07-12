@@ -300,6 +300,17 @@ function App() {
   }, [messageToTutor]);
 
   React.useEffect(() => {
+
+    const setNullValuesSetters = (param, setter, value) => {
+      for (let key in param) {
+        setValue(setter, key, value);
+      }
+    };
+    setNullValuesSetters(sendStatus, setSendStatus, "");
+
+    setNullValuesSetters(sendMessages, setSendMessages, "");
+
+
     let timerId;
     let receivedResponse = false;
     if (link !== "") {
@@ -328,19 +339,22 @@ function App() {
       }
       receivedResponse = true;
       // console.log("Response from extension:", event.data.data);
-      const data = await JSON.parse(event.data.data);
-      if (typeof data === "object") {
-        setLesson(data);
-        setEmailPupil(data.emailPupil);
-        setEmailTutor(data.emailTutor);
-        setLogsPupil(data.pupilLogs);
-        setLogsTutor(data.tutorLogs);
-      } else if (data === `404 Not Found`) {
+
+      const data = event.data.data;
+
+      if (data === `404 Not Found`) {
         setLink("");
         highlightInputLink("yellow", 3000);
       } else if (data === `Access denied` || data === undefined) {
         setLink("");
         highlightInputLink("orange", 1000);
+      } else {
+        const json = await JSON.parse(data);
+        setLesson(json);
+        setEmailPupil(json.emailPupil);
+        setEmailTutor(json.emailTutor);
+        setLogsPupil(json.pupilLogs);
+        setLogsTutor(json.tutorLogs);
       }
     });
     return () => {
@@ -412,6 +426,9 @@ function App() {
       });
     });
   };
+
+  // Передача сообщения любым слушателям в окнах
+  window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
 
   const payloadMessagePupil = new PayloadMessage(lesson.pupilChat, messageToPupil, lesson.fullIdPupil);
   const payloadMessageTutor = new PayloadMessage(lesson.tutorChat, messageToTutor, lesson.fullIdTutor);
@@ -499,23 +516,17 @@ function App() {
     return true;
   };
 
-// Передача сообщения любым слушателям в окнах
-  window.postMessage({ type: "LOAD_CONTENT_SCRIPT" }, "*");
-
   const multiPost = async () => {
     if (messageToPupil !== "" && messageToTutor !== "") {
+
+      if (lesson.statusLesson === "7") {
+        await postMessage(blPayload, "FROM_PAGE_BL", "bl");
+      }
+      await postCompensTutor();
 
       await postAndCheckMessage(payloadMessagePupil, messageToPupil, "pupilMessage");
       await postAndCheckMessage(payloadMessageTutor, messageToTutor, "tutorMessage");
 
-      if (lesson.statusLesson === "1") {
-        await postCompensTutor();
-      }
-
-      if (lesson.statusLesson === "7") {
-        await postMessage(blPayload, "FROM_PAGE_BL", "bl");
-        await postCompensTutor();
-      }
 
     } else {
       console.log(`Сообщения пустые`);
@@ -597,10 +608,14 @@ function App() {
 
     setNullValue(settersArr, "");
 
-    for (let key in sendStatus) {
-      setValue(setSendStatus, key, "");
-    }
+    const setNullValuesSetters = (param, setter, value) => {
+      for (let key in param) {
+        setValue(setter, key, value);
+      }
+    };
+    setNullValuesSetters(sendStatus, setSendStatus, "");
 
+    setNullValuesSetters(sendMessages, setSendMessages, "");
   };
 
   React.useEffect(() => {
@@ -739,13 +754,17 @@ function App() {
         </div>
         <div>
           <div className="versionText">
-            Создал&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
-                           target="_blank">VaultBoy</a>&nbsp;для ТП Тетрики, (v1.9.9.6,
-            08.07.2023). &nbsp;{!isMobileScreen && <a
+            Авторы:&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
+                            target="_blank">VaultBoy</a>&nbsp;и&nbsp;<a
+            href="https://t.me/t_a_32"
+            target="_blank">t___a_0032</a>&nbsp; (v2.0.0,
+            12.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v1.9.4</a>}
+            target="_blank">SuG Extension v2.0</a>}
           </div>
         </div>
+        ,,
+
       </div>
     </AppContext.Provider>
   );

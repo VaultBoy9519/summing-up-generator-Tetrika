@@ -92,7 +92,7 @@ body {
 .btn-email {
     height: 70%;
     line-height: 70%;
-    max-width: 200px;
+    width: 200px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -167,6 +167,12 @@ textarea:disabled {
     }
 }
 
+@media (max-width: 1199px) and (min-width: 992px) {
+    .btn-email {
+        width: 85px;
+    }
+}
+
 @media (max-width: 991px) {
 
     .card {
@@ -195,6 +201,10 @@ textarea:disabled {
 @media (max-width: 767px) {
     .table-sm {
         font-size: 14px;
+    }
+
+    .btn-email {
+        max-width: 140px;
     }
 }
 
@@ -238,13 +248,13 @@ textarea:disabled {
 
 @media (max-width: 480px) {
     .btn-email {
-        width: 100px;
+        width: 80px;
     }
 
 }
 
 
-@media (max-width: 382px) {
+@media (max-width: 396px) {
     h5 {
         font-size: 16px;
     }
@@ -266,4 +276,7 @@ textarea:disabled {
         width: 100%
     }
 
+    .btn-email {
+        width: 60px;
+    }
 }

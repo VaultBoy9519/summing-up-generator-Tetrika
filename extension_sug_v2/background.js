@@ -48,6 +48,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       const createLessonInfo = new Promise((resolve, reject) => {
         chrome.cookies.get({ url: "https://tetrika-school.ru", name: "login" }, (cookie) => {
           if (cookie) {
+            console.log("Старт");
             const lessonInfo = {};
             const linkLogs = `${dataLink}/loki_logs`;
             const linkEvents = `${dataLink}/events`;
@@ -113,12 +114,13 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                       return trigger;
                     };
 
-                    const calendarEvent = getHrefId("/adminka/calendar/", doc);
-                    const calendarEventLink = `https://tetrika-school.ru/adminka/calendar/${calendarEvent}`;
 
-                    const eventDoc = await getDocumentHtml(calendarEventLink);
+                    try {
+                      const calendarEvent = getHrefId("/adminka/calendar/", doc);
+                      const calendarEventLink = `https://tetrika-school.ru/adminka/calendar/${calendarEvent}`;
 
-                    if (eventDoc.querySelector("table")) {
+                      const eventDoc = await getDocumentHtml(calendarEventLink);
+
                       const table = eventDoc.querySelector("table");
                       const rows = table.querySelectorAll(`tr`);
                       for (let i = 0; i < rows.length; i++) {
@@ -133,7 +135,8 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                         }
                       }
                       return;
-                    } else {
+                    } catch (error) {
+                      console.log(error);
                       sendResponse(`404 Not Found`);
                       return;
                     }
@@ -365,7 +368,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
           .then(json => {
               console.log(json);
               result.message_id = json.id;
-              result.user_id = json.props.userId;
+              result.user_id = request.data.props.userId;
               return result;
             }
           )
@@ -377,7 +380,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       if (request.data.message_id !== "") {
 
         const messageUrl = `${mmUrl}/${request.data.message_id}`;
-        
+
         const deletePayload = {
           method: "DELETE",
           body: new URLSearchParams(),

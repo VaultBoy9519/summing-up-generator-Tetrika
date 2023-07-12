@@ -104,12 +104,12 @@ const ResumeField = ({
                       name="sendBL">
                 БУ
               </button>
-
               <div className="btn-group" role="group" aria-label="Basic example">
-                <button type="button" className={setClasses("btn btn-email", postMessageStatus)}
+                <button type="button" style={{ minWidth: "30px", maxWidth: "100px" }}
+                        className={setClasses("btn btn-email", postMessageStatus)}
                         onClick={postMessage}>Отп.в чат
                 </button>
-                <button ref={copyButtonEmailRef} style={{ minWidth: "200px" }} className="btn btn-email btn-secondary"
+                <button ref={copyButtonEmailRef} className="btn btn-email btn-secondary"
                         name="copyEmailButton"
                         data-clipboard-text={emailUser}>
                   {emailIsCopied ? `Email скопирован!` : emailUser === "" ? "Email" : emailUser}

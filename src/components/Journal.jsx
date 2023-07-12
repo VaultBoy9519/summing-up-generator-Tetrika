@@ -44,7 +44,7 @@ const Journal = ({ durationLesson, journal, lessonType }) => {
         </ul>
       </div>
       <span className={checkJournal() === "заполнен" ? "btn bg-success" : "btn bg-secondary"}
-            style={{ color: "white", cursor: "default" }}>
+            style={{ color: "white", cursor: "default", pointerEvents: "none" }}>
         Журнал: {checkJournal()}
       </span>
       <span
