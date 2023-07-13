@@ -117,7 +117,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                     try {
                       const calendarEvent = getHrefId("/adminka/calendar/", doc);
+
                       const calendarEventLink = `https://tetrika-school.ru/adminka/calendar/${calendarEvent}`;
+
+                      lessonInfo.eventId = calendarEvent;
 
                       const eventDoc = await getDocumentHtml(calendarEventLink);
 
@@ -151,6 +154,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
                   //Функция выбирает статус урока в объект
                   const setStatusLesson = () => {
+                    lessonInfo.statusName = generalLessonInfo["state"];
                     switch (generalLessonInfo["state"]) {
                       case "неявка ученика":
                         if (generalLessonInfo["is_intro"] === "False") {
@@ -403,6 +407,99 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       } else {
         sendMessage();
       }
+    }
+      break;
+
+    case "FROM_CONTENT_CANCEL": {
+
+      const data = request.data;
+      console.log(data);
+
+      const createRequestOpt = (action) => {
+
+        const params = {
+          action: action,
+          event_id: data.event_id,
+          redirect_to: `/adminka/lessons/${data.lesson_id}`,
+          cancel_state: action === "cancelled" ? "cancel" : "finish"
+        };
+
+        const body = new URLSearchParams(params);
+
+        const requestOptions = {
+          method: "POST",
+          body: body,
+          redirect: "follow",
+          credentials: "include"
+        };
+
+        return requestOptions;
+      };
+
+      const url = `https://tetrika-school.ru/adminka/lessons/${data.lesson_id}`;
+
+      const checkErrors = async (html, status) => {
+
+        const checkStatus = (doc, status) => {
+          const table = doc.querySelector("table");
+          const tdElements = table.querySelectorAll("td");
+
+          return Array.from(tdElements).some(td => td.innerText.includes(status));
+
+        };
+
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, "text/html");
+
+        console.log(`Проверка: `, (checkStatus(doc, status)));
+
+        if (doc.querySelector(`.text-danger`)) {
+          console.log("Ошибка - урок включен в оплату");
+          return 333;
+        } else if (checkStatus(doc, status)) {
+          console.log(`Статус ${status} успешно установлен`);
+          return 200;
+        } else {
+          console.log(`Не удалось выставить статус ${status}`);
+          return 400;
+        }
+      };
+
+      const setLessonStatus = () => {
+        postMessage(url, createRequestOpt("cancelled"))
+          .then(result => result.text())
+          .then(html => {
+            return checkErrors(html, "отменено");
+          })
+          .then(sendResponse, (error) => {
+            console.log(error);
+          });
+      };
+
+      console.log(data.lesson_status);
+
+      if (data.lesson_status !== "завершён" && data.lesson_status !== "отменён") {
+        postMessage(url, createRequestOpt("finished"))
+          .then(r => r.text())
+          .then(html => {
+            return checkErrors(html, "закончено");
+          })
+          .then(status => {
+            if (status === 200) {
+              setLessonStatus();
+            } else {
+              sendResponse(status);
+            }
+          });
+      } else if (data.lesson_status !== "отменён") {
+        console.log(`Урок в статусе "Завершен", отменяю`);
+        setLessonStatus();
+      } else {
+        console.log("урок отменен изначально");
+        sendResponse(250);
+      }
+
+
     }
       break;
 

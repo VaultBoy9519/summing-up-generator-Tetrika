@@ -9,14 +9,11 @@ const OptionalRecs = ({ optRecs, onCheckOptRecs }) => {
 
   //эта логика наполняет объект checkboxState первоначальными значениями
   React.useEffect(() => {
-    const elements = document.getElementsByClassName(`form-check-input`);
+    const elements = document.getElementsByClassName(`check-optRec`);
     for (let element of elements) {
       checkboxState[element.name] = false;
     }
   }, []);
-
-  React.useEffect(() => {
-  }, [optRecs]);
 
   React.useEffect(() => {
     onCheckOptRecs(checkboxValues);

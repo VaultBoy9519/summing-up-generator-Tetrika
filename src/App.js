@@ -11,6 +11,7 @@ import { TutorCash } from "./components/TutorCash";
 import LogAnalyzer from "./components/LogAnalyzer";
 import Journal from "./components/Journal";
 import { useMediaQuery } from "@mui/material";
+import MassMode from "./components/MassMode";
 
 
 function App() {
@@ -30,6 +31,7 @@ function App() {
   const [messageCompens, setMessageCompens] = React.useState("");
   const [logsPupil, setLogsPupil] = React.useState("");
   const [logsTutor, setLogsTutor] = React.useState("");
+  const [checkMass, setCheckMass] = React.useState("");
 
   const emptyKeys = [
     "messageToPupil",
@@ -47,7 +49,8 @@ function App() {
     "compens",
     "bl",
     "pupilMessage",
-    "tutorMessage"
+    "tutorMessage",
+    "cancelLesson"
   ];
 
   const createData = (arr, value) => {
@@ -100,6 +103,11 @@ function App() {
   //Колбэк для получения пропса из OptionalRecs
   const onCheckOptRecs = (checkboxValues) => {
     setOptRecs(checkboxValues);
+  };
+
+  //Колбэк для получения пропса из MassMode
+  const massModeParam = (checkboxState) => {
+    setCheckMass(checkboxState);
   };
 
   //отвечает за раскрашивание input-линий
@@ -263,7 +271,7 @@ function App() {
   let arrNullValues = [];
 
   //функция вызывается при нажатии кнопки "Создать"
-  const generateSummary = () => {
+  const generateSummary = async () => {
 
     //Если есть незаполненные input, названия добавляются в массив
     for (let name in lesson) {
@@ -289,6 +297,8 @@ function App() {
       setMessageToTutor(createFullMessage("Tutor"));
       setRenew(true);
     }
+
+    return true;
   };
 
   React.useEffect(() => {
@@ -419,6 +429,11 @@ function App() {
             console.log(`Статус БУ: `, event.data.data);
             setValue(setSendStatus, "bl", event.data.data);
             break;
+          case "FROM_CONTENT_CANCEL":
+            receivedResponse = true;
+            console.log(`Статус: `, event.data.data);
+            setValue(setSendStatus, "cancelLesson", event.data.data);
+            break;
           default:
             return;
         }
@@ -491,8 +506,8 @@ function App() {
       if (message !== "") {
         console.log(`Проверка статуса:`, sendStatus[status]);
         if (sendMessages[role] !== message || sendStatus[status] >= 400) {
-          if (sendStatus[status] >= 200 && sendStatus[status] <= 400) {
-
+          if (sendStatus[status] >= 400) {
+            setValue(setSendMessages, `${role}MessageId`, "");
           }
           await postMessage(payload, "FROM_PAGE_POST-MESSAGE", status);
           setValue(setSendMessages, role, message);
@@ -519,9 +534,12 @@ function App() {
   const multiPost = async () => {
     if (messageToPupil !== "" && messageToTutor !== "") {
 
-      if (lesson.statusLesson === "7") {
+      if (lesson.statusLesson === "7" || checkMass) {
+        // setValue(setLesson, "statusLesson", "7");
+        await cancelLesson();
         await postMessage(blPayload, "FROM_PAGE_BL", "bl");
       }
+
       await postCompensTutor();
 
       await postAndCheckMessage(payloadMessagePupil, messageToPupil, "pupilMessage");
@@ -534,10 +552,25 @@ function App() {
   };
 
   const logger = () => {
-    console.log(sendStatus);
-    console.log(sendMessages);
-    console.log(payloadMessagePupil);
-    console.log(payloadMessageTutor);
+    // console.log(sendStatus);
+    // console.log(sendMessages);
+    // console.log(payloadMessagePupil);
+    // console.log(payloadMessageTutor);
+    console.log(lesson);
+    console.log(messageToPupil);
+    console.log(messageToTutor);
+    console.log(tutorCash);
+  };
+
+  const cancelLesson = async () => {
+
+    const payload = {
+      lesson_id: compensPayload.lessonId,
+      event_id: lesson.eventId,
+      lesson_status: lesson.statusName
+    };
+
+    await postMessage(payload, "FROM_PAGE_CANCEL", "cancelLesson");
   };
 
   const setClasses = (standart, status) => {
@@ -629,7 +662,9 @@ function App() {
   return (
     <AppContext.Provider value={{ color, optRecs, lesson, link, colorLink }}>
       <div className="App">
-        <Header />
+        <Header
+          massMode={checkMass}
+        />
         <div>
           <div className="container">
             <div className="row">
@@ -641,7 +676,12 @@ function App() {
                       arrNullValues={arrNullValues}
                     />
                   </div>
-                  <div className="col-lg-12 optMargin">
+                  <div className="col-lg-12">
+                    <MassMode
+                      massModeParam={check => massModeParam(check)}
+                    />
+                  </div>
+                  <div className="col-lg-12">
                     <OptionalRecs onCheckOptRecs={checkboxValues => onCheckOptRecs(checkboxValues)}
                                   optRecs={optRecs} />
                   </div>
@@ -741,10 +781,10 @@ function App() {
           }
           </button>
           <button type="button"
-                  style={{ display: "none" }}
+                  style={{ display: "inline-block" }}
                   className={"btn btn-lg mx-auto mx-lg-0 mt-10 ml-10 btn-primary"}
                   onClick={logger}
-          >Консоль
+          >Тест
           </button>
           <button type="button"
                   name="clearButton"
@@ -757,14 +797,12 @@ function App() {
             Авторы:&nbsp;<a href="https://mm.tetrika.school/tetrika/messages/@vadim.bykadorov"
                             target="_blank">VaultBoy</a>&nbsp;и&nbsp;<a
             href="https://t.me/t_a_32"
-            target="_blank">t___a_0032</a>&nbsp; (v2.0.0,
-            12.07.2023). &nbsp;{!isMobileScreen && <a
+            target="_blank">t___a_0032</a>&nbsp; (v2.0.1,
+            14.07.2023). &nbsp;{!isMobileScreen && <a
             href="https://drive.google.com/u/0/uc?id=1e9vcYKp7z0hIHqnt_tS8_UpUN5VM6VmX&export=download"
-            target="_blank">SuG Extension v2.0</a>}
+            target="_blank">SuG Extension v2.0.1</a>}
           </div>
         </div>
-        ,,
-
       </div>
     </AppContext.Provider>
   );
